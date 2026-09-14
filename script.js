@@ -1,365 +1,189 @@
 // =====================================================
-// JARVIS - MAIN SCRIPT
-// AI + MEMORY + VOICE + STUDY HUB + STUDY TIMER
+// J.A.R.V.I.S.
+// COMPLETE FRONTEND SCRIPT
+// AI + MEMORY + VOICE + STUDY HUB + TIMER + HOMEWORK
 // =====================================================
 
 
 // =====================================================
-// CONVERSATION HISTORY
+// CONFIGURATION
+// =====================================================
+
+const WORKER_URL =
+    "https://jarvis-ai.tvisha-sanish.workers.dev/";
+
+
+// =====================================================
+// GLOBAL VARIABLES
 // =====================================================
 
 let conversationHistory = [];
-
-
-// =====================================================
-// PERSISTENT MEMORY
-// =====================================================
 
 let jarvisMemory =
     JSON.parse(
         localStorage.getItem("jarvisMemory") || "[]"
     );
 
-
-// =====================================================
-// STUDY SESSION VARIABLES
-// =====================================================
-
-let studyTimer = null;
-
-let studyTotalSeconds = 0;
-
-let studyRemainingSeconds = 0;
-
-let studyRunning = false;
-
-let studyStartTime = null;
-
-
-// =====================================================
-// STUDY TASKS
-// =====================================================
-
-let studyTasks = [];
-
-let currentTaskIndex = 0;
-
-
-// =====================================================
-// SAVE MEMORY
-// =====================================================
-
-function saveMemory() {
-
-    localStorage.setItem(
-        "jarvisMemory",
-        JSON.stringify(jarvisMemory)
+let homework =
+    JSON.parse(
+        localStorage.getItem("jarvisHomework") || "[]"
     );
 
-}
+let timerInterval = null;
+
+let totalStudySeconds = 0;
+
+let remainingStudySeconds = 0;
+
+let studyTimerRunning = false;
+
+let currentStudyTask = null;
+
+let recognition = null;
+
+let voiceAvailable = false;
+
+let isListening = false;
 
 
 // =====================================================
-// ADD MEMORY
+// PAGE INITIALISATION
 // =====================================================
 
-function addMemory(memory) {
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
 
-    if (!memory || memory.trim() === "") {
-        return;
+        console.log(
+            "JARVIS initialising..."
+        );
+
+        loadHomework();
+
+        initialiseVoice();
+
+        updateMemoryDisplay();
+
+        setupKeyboard();
+
+        updateSystemStatus();
+
+        setTimeout(
+            () => {
+
+                showResponse(
+                    "JARVIS online. All systems initialised."
+                );
+
+            },
+            500
+        );
+
     }
-
-    jarvisMemory.push(
-        memory.trim()
-    );
-
-    saveMemory();
-
-}
+);
 
 
 // =====================================================
-// CLEAR MEMORY
+// KEYBOARD SUPPORT
 // =====================================================
 
-function clearMemory() {
-
-    jarvisMemory = [];
-
-    saveMemory();
-
-}
-
-
-// =====================================================
-// GET MEMORY
-// =====================================================
-
-function getMemoryText() {
-
-    if (jarvisMemory.length === 0) {
-
-        return "No personal memories have been saved yet.";
-
-    }
-
-    return jarvisMemory
-        .map(
-            (memory, index) =>
-                `${index + 1}. ${memory}`
-        )
-        .join("\n");
-
-}
-
-
-// =====================================================
-// SEND COMMAND
-// =====================================================
-
-function sendCommand() {
+function setupKeyboard() {
 
     const input =
-        document.getElementById("commandInput");
+        document.getElementById(
+            "commandInput"
+        );
 
-    const command =
-        input.value.trim();
-
-    const lowerCommand =
-        command.toLowerCase();
-
-    const response =
-        document.getElementById("response");
-
-
-    if (command === "") {
-
-        response.innerText =
-            "JARVIS: Please give me a command.";
-
-        speak(response.innerText);
-
+    if (!input) {
         return;
-
     }
 
+    input.addEventListener(
+        "keydown",
+        (event) => {
 
-    // REMEMBER
+            if (
+                event.key === "Enter"
+            ) {
 
-    if (
-        lowerCommand.startsWith("remember that ") ||
-        lowerCommand.startsWith("remember ")
-    ) {
+                sendCommand();
 
-        let memory =
-            command
-                .replace(
-                    /^remember that /i,
-                    ""
-                )
-                .replace(
-                    /^remember /i,
-                    ""
-                )
-                .trim();
-
-
-        if (memory !== "") {
-
-            addMemory(memory);
-
-            response.innerText =
-                "JARVIS: I'll remember that.";
-
-            speak(response.innerText);
-
-            input.value = "";
-
-            return;
+            }
 
         }
+    );
 
-    }
+}
 
 
-    // CLEAR MEMORY
+// =====================================================
+// SYSTEM STATUS
+// =====================================================
 
-    if (
-        lowerCommand.includes("forget everything") ||
-        lowerCommand.includes("clear my memory") ||
-        lowerCommand.includes("erase my memory")
-    ) {
+function updateSystemStatus() {
 
-        clearMemory();
+    const status =
+        document.querySelector(
+            ".system-status"
+        );
 
-        response.innerText =
-            "JARVIS: I've cleared my saved memory.";
-
-        speak(response.innerText);
-
-        input.value = "";
-
+    if (!status) {
         return;
-
     }
 
+    status.innerHTML = `
+        <span class="status-dot">●</span>
+        SYSTEM ONLINE
+    `;
 
-    // SHOW MEMORY
+}
 
-    if (
-        lowerCommand.includes("what do you remember") ||
-        lowerCommand.includes("show my memory") ||
-        lowerCommand.includes("what do you know about me")
-    ) {
 
-        openMemory();
+// =====================================================
+// AI COMMAND SYSTEM
+// =====================================================
 
-        input.value = "";
+async function sendCommand() {
 
+    const input =
+        document.getElementById(
+            "commandInput"
+        );
+
+    if (!input) {
         return;
-
     }
 
+    const message =
+        input.value.trim();
 
-    // STUDY HUB
-
-    if (
-        lowerCommand === "study" ||
-        lowerCommand === "study hub" ||
-        lowerCommand.includes("start studying") ||
-        lowerCommand.includes("start study")
-    ) {
-
-        openStudyHub();
-
-        input.value = "";
-
+    if (!message) {
         return;
-
     }
 
 
-    // SCHEDULE
-
-    if (
-        lowerCommand.includes("schedule") ||
-        lowerCommand.includes("calendar") ||
-        lowerCommand.includes("what do i have today") ||
-        lowerCommand.includes("what's on today")
-    ) {
-
-        openSchedule();
-
-        input.value = "";
-
-        return;
-
-    }
-
-
-    // STUDY REQUESTS
-
-    if (
-        lowerCommand.includes("revise") ||
-        lowerCommand.includes("revision") ||
-        lowerCommand.includes("physics") ||
-        lowerCommand.includes("chemistry") ||
-        lowerCommand.includes("math")
-    ) {
-
-        openStudyHub();
-
-        input.value = "";
-
-        return;
-
-    }
-
-
-    // DOCUMENTS
-
-    if (
-        lowerCommand.includes("notes") ||
-        lowerCommand.includes("document") ||
-        lowerCommand.includes("docs") ||
-        lowerCommand.includes("find my")
-    ) {
-
-        response.innerText =
-            "JARVIS: Document search detected. Google Drive integration will be connected later.";
-
-        speak(response.innerText);
-
-        input.value = "";
-
-        return;
-
-    }
-
-
-    // HOMEWORK
-
-    if (
-        lowerCommand.includes("homework") ||
-        lowerCommand.includes("assignment") ||
-        lowerCommand.includes("assignments")
-    ) {
-
-        openHomework();
-
-        input.value = "";
-
-        return;
-
-    }
-
-
-    // TESTS
-
-    if (
-        lowerCommand.includes("test") ||
-        lowerCommand.includes("tests") ||
-        lowerCommand.includes("exam") ||
-        lowerCommand.includes("exams")
-    ) {
-
-        openTests();
-
-        input.value = "";
-
-        return;
-
-    }
-
-
-    // AI
-
-    askJARVIS(command);
+    // Clear input
 
     input.value = "";
 
-}
+
+    // Show user message
+
+    showUserMessage(
+        message
+    );
 
 
-// =====================================================
-// ASK JARVIS AI
-// =====================================================
+    // Show thinking state
 
-async function askJARVIS(message) {
-
-    const response =
-        document.getElementById("response");
-
-
-    response.innerText =
-        "JARVIS: Thinking...";
+    showThinking();
 
 
     try {
 
-        const result =
+        const response =
             await fetch(
-                "https://jarvis-ai.tvisha-sanish.workers.dev/",
+                WORKER_URL,
                 {
 
                     method: "POST",
@@ -369,90 +193,108 @@ async function askJARVIS(message) {
                             "application/json"
                     },
 
-                    body: JSON.stringify({
+                    body:
+                        JSON.stringify({
 
-                        message:
-                            message,
+                            message:
+                                message,
 
-                        history:
-                            conversationHistory,
+                            history:
+                                conversationHistory,
 
-                        memory:
-                            jarvisMemory
+                            memory:
+                                jarvisMemory
 
-                    })
+                        })
 
                 }
             );
 
 
         const data =
-            await result.json();
+            await response.json();
 
 
-        if (!result.ok) {
+        if (!response.ok) {
 
             throw new Error(
                 data.error ||
-                "Request failed"
+                "JARVIS server error."
             );
 
         }
 
 
-        conversationHistory.push({
-
-            role: "user",
-
-            content:
-                message
-
-        });
+        const answer =
+            data.response ||
+            "I could not generate a response.";
 
 
-        conversationHistory.push({
+        // Save conversation
 
-            role: "assistant",
+        conversationHistory.push(
+            {
+                role: "user",
+                content: message
+            }
+        );
 
-            content:
-                data.response
+        conversationHistory.push(
+            {
+                role: "assistant",
+                content: answer
+            }
+        );
 
-        });
 
+        // Limit history size
 
         if (
-            conversationHistory.length > 20
+            conversationHistory.length >
+            20
         ) {
 
             conversationHistory =
-                conversationHistory.slice(-20);
+                conversationHistory.slice(
+                    -20
+                );
 
         }
 
 
-        response.innerText =
-            "JARVIS: " +
-            data.response;
+        // Display answer
 
-
-        speak(
-            response.innerText
+        showResponse(
+            answer
         );
 
 
-    } catch (error) {
+        // Speak answer
+
+        speak(
+            answer
+        );
+
+
+        // Check whether user asked JARVIS
+        // to remember something
+
+        detectMemoryRequest(
+            message
+        );
+
+    }
+
+    catch (error) {
 
         console.error(
-            "JARVIS connection error:",
+            "JARVIS error:",
             error
         );
 
 
-        response.innerText =
-            "JARVIS: I'm having trouble connecting to my AI system.";
-
-        speak(
-            response.innerText
+        showResponse(
+            "I am unable to connect to my AI core right now."
         );
 
     }
@@ -461,26 +303,589 @@ async function askJARVIS(message) {
 
 
 // =====================================================
-// MEMORY
+// RESPONSE DISPLAY
 // =====================================================
 
-function openMemory() {
+function showResponse(
+    text
+) {
 
     const response =
-        document.getElementById("response");
+        document.getElementById(
+            "response"
+        );
+
+    if (!response) {
+        return;
+    }
 
 
-    const memoryText =
-        getMemoryText();
+    response.innerHTML = `
+
+        <span class="response-label">
+            JARVIS
+        </span>
+
+        <span class="response-text">
+            ${formatText(text)}
+        </span>
+
+    `;
+
+}
 
 
-    response.innerText =
-        "JARVIS: Here is what I remember:\n\n" +
-        memoryText;
+// =====================================================
+// USER MESSAGE DISPLAY
+// =====================================================
+
+function showUserMessage(
+    message
+) {
+
+    const response =
+        document.getElementById(
+            "response"
+        );
+
+    if (!response) {
+        return;
+    }
 
 
-    speak(
-        "Here is what I remember. " +
+    response.innerHTML = `
+
+        <span class="response-label">
+            COMMAND
+        </span>
+
+        <span class="response-text">
+            ${formatText(message)}
+        </span>
+
+    `;
+
+}
+
+
+// =====================================================
+// THINKING DISPLAY
+// =====================================================
+
+function showThinking() {
+
+    const response =
+        document.getElementById(
+            "response"
+        );
+
+    if (!response) {
+        return;
+    }
+
+
+    response.innerHTML = `
+
+        <span class="response-label">
+            JARVIS
+        </span>
+
+        <span class="response-text">
+            Processing...
+        </span>
+
+    `;
+
+}
+
+
+// =====================================================
+// BASIC TEXT FORMATTING
+// =====================================================
+
+function formatText(
+    text
+) {
+
+    if (!text) {
+        return "";
+    }
+
+
+    return text
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /\n/g,
+            "<br>"
+        );
+
+}
+
+
+// =====================================================
+// VOICE RECOGNITION
+// =====================================================
+
+function initialiseVoice() {
+
+    const SpeechRecognition =
+        window.SpeechRecognition ||
+        window.webkitSpeechRecognition;
+
+
+    if (!SpeechRecognition) {
+
+        console.log(
+            "Speech recognition is not supported."
+        );
+
+        voiceAvailable = false;
+
+        return;
+
+    }
+
+
+    recognition =
+        new SpeechRecognition();
+
+
+    recognition.continuous = true;
+
+    recognition.interimResults = false;
+
+    recognition.lang = "en-SG";
+
+
+    recognition.onstart =
+        () => {
+
+            isListening = true;
+
+            updateVoiceStatus(
+                "LISTENING"
+            );
+
+        };
+
+
+    recognition.onresult =
+        (event) => {
+
+            const lastResult =
+                event.results[
+                    event.results.length - 1
+                ];
+
+            const transcript =
+                lastResult[0].transcript.trim();
+
+
+            if (!transcript) {
+                return;
+            }
+
+
+            console.log(
+                "Voice command:",
+                transcript
+            );
+
+
+            const input =
+                document.getElementById(
+                    "commandInput"
+                );
+
+
+            if (input) {
+
+                input.value =
+                    transcript;
+
+            }
+
+
+            sendCommand();
+
+        };
+
+
+    recognition.onerror =
+        (event) => {
+
+            console.log(
+                "Voice recognition:",
+                event.error
+            );
+
+
+            isListening = false;
+
+            updateVoiceStatus(
+                "VOICE READY"
+            );
+
+
+            /*
+             * Some browsers report "not-allowed"
+             * when microphone permission has not
+             * been granted.
+             */
+
+            if (
+                event.error ===
+                "not-allowed"
+            ) {
+
+                console.log(
+                    "Microphone permission required."
+                );
+
+                return;
+
+            }
+
+        };
+
+
+    recognition.onend =
+        () => {
+
+            isListening = false;
+
+
+            updateVoiceStatus(
+                "VOICE READY"
+            );
+
+
+            /*
+             * Automatically restart listening
+             * when possible.
+             */
+
+            if (
+                voiceAvailable
+            ) {
+
+                setTimeout(
+                    () => {
+
+                        try {
+
+                            recognition.start();
+
+                        }
+
+                        catch (
+                            error
+                        ) {
+
+                            console.log(
+                                "Voice restart waiting..."
+                            );
+
+                        }
+
+                    },
+                    1000
+                );
+
+            }
+
+        };
+
+
+    voiceAvailable = true;
+
+
+    /*
+     * Attempt automatic startup.
+     *
+     * Chrome may require the user to interact
+     * with the page before allowing microphone
+     * access.
+     */
+
+    setTimeout(
+        () => {
+
+            startListening();
+
+        },
+        1200
+    );
+
+}
+
+
+// =====================================================
+// START LISTENING
+// =====================================================
+
+function startListening() {
+
+    if (
+        !recognition ||
+        !voiceAvailable
+    ) {
+
+        return;
+
+    }
+
+
+    if (isListening) {
+        return;
+    }
+
+
+    try {
+
+        recognition.start();
+
+    }
+
+    catch (
+        error
+    ) {
+
+        console.log(
+            "Unable to start voice:",
+            error
+        );
+
+    }
+
+}
+
+
+// =====================================================
+// VOICE STATUS
+// =====================================================
+
+function updateVoiceStatus(
+    status
+) {
+
+    const systemData =
+        document.querySelectorAll(
+            ".system-data strong"
+        );
+
+
+    /*
+     * The third system item is VOICE.
+     */
+
+    if (
+        systemData.length >= 3
+    ) {
+
+        systemData[2].textContent =
+            status;
+
+    }
+
+
+    const ready =
+        document.querySelector(
+            ".ready"
+        );
+
+
+    if (ready) {
+
+        ready.innerHTML = `
+
+            <span class="status-indicator">
+                ●
+            </span>
+
+            ${status === "LISTENING"
+                ? "LISTENING FOR COMMAND"
+                : "READY FOR COMMAND"}
+
+        `;
+
+    }
+
+}
+
+
+// =====================================================
+// TEXT-TO-SPEECH
+// =====================================================
+
+function speak(
+    text
+) {
+
+    if (
+        !("speechSynthesis" in window)
+    ) {
+
+        return;
+
+    }
+
+
+    speechSynthesis.cancel();
+
+
+    const cleanText =
+        text
+            .replace(
+                /[*#_`]/g,
+                ""
+            )
+            .replace(
+                /\n/g,
+                " "
+            );
+
+
+    const utterance =
+        new SpeechSynthesisUtterance(
+            cleanText
+        );
+
+
+    utterance.lang =
+        "en-SG";
+
+    utterance.rate =
+        1;
+
+    utterance.pitch =
+        0.9;
+
+    utterance.volume =
+        1;
+
+
+    speechSynthesis.speak(
+        utterance
+    );
+
+}
+
+
+// =====================================================
+// MEMORY SYSTEM
+// =====================================================
+
+function detectMemoryRequest(
+    message
+) {
+
+    const lower =
+        message.toLowerCase();
+
+
+    const memoryTriggers = [
+
+        "remember that",
+
+        "remember this",
+
+        "remember my",
+
+        "don't forget",
+
+        "do not forget",
+
+        "save this",
+
+        "save that"
+
+    ];
+
+
+    const matched =
+        memoryTriggers.some(
+            trigger =>
+                lower.includes(
+                    trigger
+                )
+        );
+
+
+    if (!matched) {
+        return;
+    }
+
+
+    let memoryText =
+        message;
+
+
+    const patterns = [
+
+        "remember that",
+
+        "remember this",
+
+        "remember my",
+
+        "don't forget",
+
+        "do not forget",
+
+        "save this",
+
+        "save that"
+
+    ];
+
+
+    for (
+        const pattern of patterns
+    ) {
+
+        const index =
+            lower.indexOf(
+                pattern
+            );
+
+
+        if (
+            index !== -1
+        ) {
+
+            memoryText =
+                message
+                    .substring(
+                        index +
+                        pattern.length
+                    )
+                    .trim();
+
+            break;
+
+        }
+
+    }
+
+
+    if (!memoryText) {
+        return;
+    }
+
+
+    saveMemory(
         memoryText
     );
 
@@ -488,71 +893,159 @@ function openMemory() {
 
 
 // =====================================================
-// OPEN STUDY HUB
+// SAVE MEMORY
 // =====================================================
 
-function openStudyHub() {
+function saveMemory(
+    memoryText
+) {
 
-    const studyHub =
-        document.getElementById("studyHub");
+    if (
+        jarvisMemory.includes(
+            memoryText
+        )
+    ) {
 
-
-    if (!studyHub) {
         return;
+
     }
 
 
-    studyHub.classList.add(
-        "active"
+    jarvisMemory.push(
+        memoryText
     );
 
 
-    const topic =
-        document.getElementById("studyTopic");
+    localStorage.setItem(
+        "jarvisMemory",
+        JSON.stringify(
+            jarvisMemory
+        )
+    );
 
 
-    if (topic) {
-
-        setTimeout(
-            function() {
-
-                topic.focus();
-
-            },
-            200
-        );
-
-    }
+    updateMemoryDisplay();
 
 
-    const response =
-        document.getElementById("response");
-
-
-    response.innerText =
-        "JARVIS: Study Hub activated.";
+    console.log(
+        "Memory saved:",
+        memoryText
+    );
 
 }
 
 
 // =====================================================
-// CLOSE STUDY HUB
+// MEMORY DISPLAY
 // =====================================================
 
-function closeStudyHub() {
+function updateMemoryDisplay() {
 
-    const studyHub =
-        document.getElementById("studyHub");
+    const memoryPanel =
+        document.querySelector(
+            ".memory-panel p"
+        );
 
 
-    if (!studyHub) {
+    if (!memoryPanel) {
         return;
     }
 
 
-    studyHub.classList.remove(
-        "active"
+    if (
+        jarvisMemory.length === 0
+    ) {
+
+        memoryPanel.textContent =
+            "No saved memories yet.";
+
+        return;
+
+    }
+
+
+    memoryPanel.textContent =
+        `${jarvisMemory.length} saved memories available.`;
+
+}
+
+
+// =====================================================
+// MEMORY WINDOW
+// =====================================================
+
+function openMemory() {
+
+    let memoryText =
+        "";
+
+
+    if (
+        jarvisMemory.length === 0
+    ) {
+
+        memoryText =
+            "No saved memories yet.";
+
+    }
+
+    else {
+
+        memoryText =
+            jarvisMemory
+                .map(
+                    (memory, index) =>
+                        `${index + 1}. ${memory}`
+                )
+                .join("\n");
+
+    }
+
+
+    alert(
+        "JARVIS MEMORY\n\n" +
+        memoryText
     );
+
+}
+
+
+// =====================================================
+// STUDY HUB
+// =====================================================
+
+function openStudyHub() {
+
+    const hub =
+        document.getElementById(
+            "studyHub"
+        );
+
+
+    if (hub) {
+
+        hub.style.display =
+            "flex";
+
+    }
+
+}
+
+
+function closeStudyHub() {
+
+    const hub =
+        document.getElementById(
+            "studyHub"
+        );
+
+
+    if (hub) {
+
+        hub.style.display =
+            "none";
+
+    }
 
 }
 
@@ -561,7 +1054,7 @@ function closeStudyHub() {
 // GENERATE STUDY SESSION
 // =====================================================
 
-async function generateStudySession() {
+function generateStudySession() {
 
     const subject =
         document.getElementById(
@@ -576,9 +1069,11 @@ async function generateStudySession() {
 
 
     const duration =
-        document.getElementById(
-            "studyDuration"
-        ).value;
+        parseInt(
+            document.getElementById(
+                "studyDuration"
+            ).value
+        );
 
 
     const goal =
@@ -587,238 +1082,166 @@ async function generateStudySession() {
         ).value;
 
 
-    const result =
-        document.getElementById(
-            "studyResult"
+    if (!topic) {
+
+        alert(
+            "Please enter a study topic."
         );
-
-
-    const activeSession =
-        document.getElementById(
-            "activeStudySession"
-        );
-
-
-    if (topic === "") {
-
-        result.innerHTML = `
-
-            <div class="response-label">
-                JARVIS STUDY SYSTEM
-            </div>
-
-            <p>
-                Please enter a topic first.
-            </p>
-
-        `;
 
         return;
 
     }
 
 
-    result.innerHTML = `
+    currentStudyTask = {
+
+        subject:
+            subject,
+
+        topic:
+            topic,
+
+        duration:
+            duration,
+
+        goal:
+            goal
+
+    };
+
+
+    totalStudySeconds =
+        duration * 60;
+
+
+    remainingStudySeconds =
+        totalStudySeconds;
+
+
+    updateTimerDisplay();
+
+
+    document.getElementById(
+        "sessionSubject"
+    ).textContent =
+        subject;
+
+
+    document.getElementById(
+        "sessionTopic"
+    ).textContent =
+        topic;
+
+
+    document.getElementById(
+        "sessionStatus"
+    ).textContent =
+        "READY";
+
+
+    document.getElementById(
+        "currentTask"
+    ).textContent =
+        getStudyTask(
+            goal
+        );
+
+
+    document.getElementById(
+        "studyResult"
+    ).innerHTML = `
 
         <div class="response-label">
             JARVIS STUDY SYSTEM
         </div>
 
         <p>
-            Generating your ${duration}-minute
-            ${subject} study session...
+            Study session generated for
+            <strong>${subject}</strong>:
+            ${topic}
+        </p>
+
+        <p>
+            Duration:
+            <strong>${duration} minutes</strong>
+        </p>
+
+        <p>
+            Goal:
+            <strong>${goal}</strong>
         </p>
 
     `;
 
 
-    const studyPrompt = `
-
-You are JARVIS, a personal AI study assistant.
-
-Create a structured study session for a secondary school student.
-
-Subject: ${subject}
-
-Topic: ${topic}
-
-Duration: ${duration} minutes
-
-Study goal: ${goal}
-
-Create a practical study plan.
-
-Include:
-
-1. Warm-up / recall
-2. Key concepts
-3. Main learning or revision activity
-4. Practice questions or tasks
-5. Final recall/check
-6. Time breakdown
-
-Keep it realistic and suitable for a secondary school student.
-
-`;
+    document.getElementById(
+        "activeStudySession"
+    ).style.display =
+        "block";
 
 
-    try {
+    updateProgress(
+        0
+    );
 
-        const aiResult =
-            await fetch(
-                "https://jarvis-ai.tvisha-sanish.workers.dev/",
-                {
 
-                    method: "POST",
+    resetTimer();
 
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
+}
 
-                    body: JSON.stringify({
 
-                        message:
-                            studyPrompt,
+// =====================================================
+// STUDY TASK GENERATOR
+// =====================================================
 
-                        history:
-                            conversationHistory,
+function getStudyTask(
+    goal
+) {
 
-                        memory:
-                            jarvisMemory
+    switch (
+        goal
+    ) {
 
-                    })
+        case "Learn the topic":
 
-                }
+            return (
+                "Read and understand the key concepts."
             );
 
 
-        const data =
-            await aiResult.json();
+        case "Revise":
 
-
-        if (!aiResult.ok) {
-
-            throw new Error(
-                data.error ||
-                "Study generation failed."
-            );
-
-        }
-
-
-        result.innerHTML = `
-
-            <div class="response-label">
-                JARVIS STUDY PLAN
-            </div>
-
-            <p>
-                <strong>${subject}</strong>
-            </p>
-
-            <p>
-                <strong>Topic:</strong>
-                ${topic}
-            </p>
-
-            <p>
-                <strong>Duration:</strong>
-                ${duration} minutes
-            </p>
-
-            <hr>
-
-            <div class="study-ai-response">
-                ${formatStudyResponse(data.response)}
-            </div>
-
-        `;
-
-
-        // Prepare the actual timer session
-
-        prepareStudySession(
-            subject,
-            topic,
-            duration
-        );
-
-
-        activeSession.scrollIntoView({
-            behavior: "smooth",
-            block: "nearest"
-        });
-
-
-        conversationHistory.push({
-
-            role: "user",
-
-            content:
-                studyPrompt
-
-        });
-
-
-        conversationHistory.push({
-
-            role: "assistant",
-
-            content:
-                data.response
-
-        });
-
-
-        if (
-            conversationHistory.length > 20
-        ) {
-
-            conversationHistory =
-                conversationHistory.slice(-20);
-
-        }
-
-
-        const response =
-            document.getElementById(
-                "response"
+            return (
+                "Review your notes and recall the main ideas."
             );
 
 
-        response.innerText =
-            "JARVIS: Your study session is ready. Press START when you're ready.";
+        case "Prepare for a test":
+
+            return (
+                "Review key concepts, formulas and common question types."
+            );
 
 
-        speak(
-            `Your ${duration} minute ${subject} study session is ready.`
-        );
+        case "Practise questions":
+
+            return (
+                "Attempt practice questions without looking at the answers."
+            );
 
 
-    } catch (error) {
+        case "Memorise key concepts":
 
-        console.error(
-            "Study Hub error:",
-            error
-        );
+            return (
+                "Use active recall to memorise the important information."
+            );
 
 
-        result.innerHTML = `
+        default:
 
-            <div class="response-label">
-                JARVIS STUDY SYSTEM
-            </div>
-
-            <p>
-                I couldn't generate your study session.
-            </p>
-
-            <p>
-                Please try again.
-            </p>
-
-        `;
+            return (
+                "Begin studying your selected topic."
+            );
 
     }
 
@@ -826,125 +1249,26 @@ Keep it realistic and suitable for a secondary school student.
 
 
 // =====================================================
-// PREPARE STUDY SESSION
-// =====================================================
-
-function prepareStudySession(
-    subject,
-    topic,
-    duration
-) {
-
-    const activeSession =
-        document.getElementById(
-            "activeStudySession"
-        );
-
-
-    const sessionSubject =
-        document.getElementById(
-            "sessionSubject"
-        );
-
-
-    const sessionTopic =
-        document.getElementById(
-            "sessionTopic"
-        );
-
-
-    const currentTask =
-        document.getElementById(
-            "currentTask"
-        );
-
-
-    const sessionStatus =
-        document.getElementById(
-            "sessionStatus"
-        );
-
-
-    const durationNumber =
-        parseInt(
-            duration
-        );
-
-
-    studyTotalSeconds =
-        durationNumber * 60;
-
-
-    studyRemainingSeconds =
-        studyTotalSeconds;
-
-
-    studyRunning =
-        false;
-
-
-    currentTaskIndex =
-        0;
-
-
-    studyStartTime =
-        null;
-
-
-    studyTasks = [
-
-        "Warm up by recalling what you already know.",
-
-        `Review the key concepts of ${topic}.`,
-
-        `Work through examples related to ${topic}.`,
-
-        `Complete practice questions on ${topic}.`,
-
-        "Check your answers and identify weak areas.",
-
-        "Do a final recall without looking at your notes."
-
-    ];
-
-
-    sessionSubject.innerText =
-        subject;
-
-
-    sessionTopic.innerText =
-        topic;
-
-
-    currentTask.innerText =
-        studyTasks[0];
-
-
-    sessionStatus.innerText =
-        "READY";
-
-
-    updateTimerDisplay();
-
-
-    updateProgress();
-
-
-    activeSession.classList.add(
-        "session-visible"
-    );
-
-}
-
-
-// =====================================================
-// START TIMER
+// STUDY TIMER
 // =====================================================
 
 function startTimer() {
 
     if (
-        studyTotalSeconds <= 0
+        !currentStudyTask
+    ) {
+
+        alert(
+            "Generate a study session first."
+        );
+
+        return;
+
+    }
+
+
+    if (
+        studyTimerRunning
     ) {
 
         return;
@@ -952,56 +1276,51 @@ function startTimer() {
     }
 
 
-    if (studyRunning) {
-
-        return;
-
-    }
-
-
-    studyRunning =
+    studyTimerRunning =
         true;
 
 
-    studyStartTime =
-        new Date();
-
-
-    const sessionStatus =
-        document.getElementById(
-            "sessionStatus"
-        );
-
-
-    sessionStatus.innerText =
+    document.getElementById(
+        "sessionStatus"
+    ).textContent =
         "RUNNING";
 
 
-    speak(
-        "Study session started."
-    );
-
-
-    studyTimer =
+    timerInterval =
         setInterval(
-            function() {
+            () => {
 
-                studyRemainingSeconds--;
+                if (
+                    remainingStudySeconds <= 0
+                ) {
+
+                    finishStudySession();
+
+                    return;
+
+                }
+
+
+                remainingStudySeconds--;
+
 
                 updateTimerDisplay();
 
-                updateProgress();
 
-                updateCurrentTask();
+                const completed =
+                    1 -
+                    (
+                        remainingStudySeconds /
+                        totalStudySeconds
+                    );
 
 
-                if (
-                    studyRemainingSeconds <= 0
-                ) {
+                updateProgress(
+                    completed * 100
+                );
 
-                    completeStudySession();
 
-                }
+                updateCurrentStudyTask();
 
             },
             1000
@@ -1016,7 +1335,9 @@ function startTimer() {
 
 function pauseTimer() {
 
-    if (!studyRunning) {
+    if (
+        !studyTimerRunning
+    ) {
 
         return;
 
@@ -1024,27 +1345,22 @@ function pauseTimer() {
 
 
     clearInterval(
-        studyTimer
+        timerInterval
     );
 
 
-    studyRunning =
+    timerInterval =
+        null;
+
+
+    studyTimerRunning =
         false;
 
 
-    const sessionStatus =
-        document.getElementById(
-            "sessionStatus"
-        );
-
-
-    sessionStatus.innerText =
+    document.getElementById(
+        "sessionStatus"
+    ).textContent =
         "PAUSED";
-
-
-    speak(
-        "Study session paused."
-    );
 
 }
 
@@ -1056,220 +1372,68 @@ function pauseTimer() {
 function resetTimer() {
 
     clearInterval(
-        studyTimer
+        timerInterval
     );
 
 
-    studyRunning =
+    timerInterval =
+        null;
+
+
+    studyTimerRunning =
         false;
 
 
-    studyRemainingSeconds =
-        studyTotalSeconds;
+    if (
+        currentStudyTask
+    ) {
+
+        totalStudySeconds =
+            currentStudyTask.duration *
+            60;
+
+        remainingStudySeconds =
+            totalStudySeconds;
+
+    }
 
 
-    currentTaskIndex =
-        0;
+    updateTimerDisplay();
 
 
-    const sessionStatus =
+    updateProgress(
+        0
+    );
+
+
+    const status =
         document.getElementById(
             "sessionStatus"
         );
 
 
-    sessionStatus.innerText =
-        "READY";
+    if (status) {
+
+        status.textContent =
+            "READY";
+
+    }
 
 
-    updateTimerDisplay();
-
-    updateProgress();
-
-    updateCurrentTask();
-
-
-    speak(
-        "Study session reset."
-    );
-
-}
-
-
-// =====================================================
-// UPDATE TIMER DISPLAY
-// =====================================================
-
-function updateTimerDisplay() {
-
-    const timerDisplay =
+    const task =
         document.getElementById(
-            "timerDisplay"
+            "currentTask"
         );
 
 
-    if (!timerDisplay) {
-        return;
-    }
-
-
-    const minutes =
-        Math.floor(
-            studyRemainingSeconds / 60
-        );
-
-
-    const seconds =
-        studyRemainingSeconds % 60;
-
-
-    timerDisplay.innerText =
-        String(minutes).padStart(2, "0") +
-        ":" +
-        String(seconds).padStart(2, "0");
-
-}
-
-
-// =====================================================
-// UPDATE PROGRESS
-// =====================================================
-
-function updateProgress() {
-
-    if (
-        studyTotalSeconds <= 0
-    ) {
-
-        return;
-
-    }
-
-
-    const elapsed =
-        studyTotalSeconds -
-        studyRemainingSeconds;
-
-
-    const percentage =
-        Math.min(
-            100,
-            Math.round(
-                (elapsed /
-                    studyTotalSeconds) *
-                100
-            )
-        );
-
-
-    const progressFill =
-        document.getElementById(
-            "progressFill"
-        );
-
-
-    const progressPercent =
-        document.getElementById(
-            "progressPercent"
-        );
-
-
-    if (progressFill) {
-
-        progressFill.style.width =
-            percentage + "%";
-
-    }
-
-
-    if (progressPercent) {
-
-        progressPercent.innerText =
-            percentage + "%";
-
-    }
-
-}
-
-
-// =====================================================
-// UPDATE CURRENT TASK
-// =====================================================
-
-function updateCurrentTask() {
-
-    if (
-        !studyRunning ||
-        studyTasks.length === 0
-    ) {
-
-        return;
-
-    }
-
-
-    const elapsed =
-        studyTotalSeconds -
-        studyRemainingSeconds;
-
-
-    const progress =
-        elapsed /
-        studyTotalSeconds;
-
-
-    let newIndex;
-
-
-    if (progress < 0.15) {
-
-        newIndex = 0;
-
-    } else if (progress < 0.30) {
-
-        newIndex = 1;
-
-    } else if (progress < 0.55) {
-
-        newIndex = 2;
-
-    } else if (progress < 0.75) {
-
-        newIndex = 3;
-
-    } else if (progress < 0.90) {
-
-        newIndex = 4;
-
-    } else {
-
-        newIndex = 5;
-
-    }
-
-
-    if (
-        newIndex !== currentTaskIndex
-    ) {
-
-        currentTaskIndex =
-            newIndex;
-
-
-        const currentTask =
-            document.getElementById(
-                "currentTask"
-            );
-
-
-        if (currentTask) {
-
-            currentTask.innerText =
-                studyTasks[
-                    currentTaskIndex
-                ];
-
-        }
+    if (task) {
+
+        task.textContent =
+            currentStudyTask
+                ? getStudyTask(
+                    currentStudyTask.goal
+                )
+                : "Prepare to begin.";
 
     }
 
@@ -1282,8 +1446,159 @@ function updateCurrentTask() {
 
 function finishStudySession() {
 
+    clearInterval(
+        timerInterval
+    );
+
+
+    timerInterval =
+        null;
+
+
+    studyTimerRunning =
+        false;
+
+
+    remainingStudySeconds =
+        0;
+
+
+    updateTimerDisplay();
+
+
+    updateProgress(
+        100
+    );
+
+
+    const status =
+        document.getElementById(
+            "sessionStatus"
+        );
+
+
+    if (status) {
+
+        status.textContent =
+            "COMPLETED";
+
+    }
+
+
+    const task =
+        document.getElementById(
+            "currentTask"
+        );
+
+
+    if (task) {
+
+        task.textContent =
+            "Study session completed. Great work.";
+
+    }
+
+
+    speak(
+        "Study session completed. Great work."
+    );
+
+}
+
+
+// =====================================================
+// TIMER DISPLAY
+// =====================================================
+
+function updateTimerDisplay() {
+
+    const display =
+        document.getElementById(
+            "timerDisplay"
+        );
+
+
+    if (!display) {
+        return;
+    }
+
+
+    const minutes =
+        Math.floor(
+            remainingStudySeconds /
+            60
+        );
+
+
+    const seconds =
+        remainingStudySeconds %
+        60;
+
+
+    display.textContent =
+        `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+
+}
+
+
+// =====================================================
+// STUDY PROGRESS
+// =====================================================
+
+function updateProgress(
+    percent
+) {
+
+    const safePercent =
+        Math.max(
+            0,
+            Math.min(
+                100,
+                percent
+            )
+        );
+
+
+    const percentText =
+        document.getElementById(
+            "progressPercent"
+        );
+
+
+    const fill =
+        document.getElementById(
+            "progressFill"
+        );
+
+
+    if (percentText) {
+
+        percentText.textContent =
+            `${Math.round(
+                safePercent
+            )}%`;
+
+    }
+
+
+    if (fill) {
+
+        fill.style.width =
+            `${safePercent}%`;
+
+    }
+
+}
+
+
+// =====================================================
+// UPDATE CURRENT STUDY TASK
+// =====================================================
+
+function updateCurrentStudyTask() {
+
     if (
-        studyTotalSeconds <= 0
+        !currentStudyTask
     ) {
 
         return;
@@ -1291,190 +1606,549 @@ function finishStudySession() {
     }
 
 
-    clearInterval(
-        studyTimer
-    );
+    const elapsed =
+        totalStudySeconds -
+        remainingStudySeconds;
 
 
-    studyRunning =
-        false;
-
-
-    const sessionStatus =
-        document.getElementById(
-            "sessionStatus"
+    const elapsedMinutes =
+        Math.floor(
+            elapsed /
+            60
         );
 
 
-    sessionStatus.innerText =
-        "COMPLETED";
+    let taskText;
 
 
-    const currentTask =
-        document.getElementById(
-            "currentTask"
-        );
+    if (
+        elapsedMinutes < 5
+    ) {
 
+        taskText =
+            "Review the topic and identify the key concepts.";
 
-    currentTask.innerText =
-        "Session completed. Excellent work.";
+    }
 
+    else if (
+        elapsedMinutes < 15
+    ) {
 
-    const response =
-        document.getElementById(
-            "response"
-        );
+        taskText =
+            "Study and understand the main concepts.";
 
+    }
 
-    response.innerText =
-        "JARVIS: Study session completed. Well done.";
+    else if (
+        elapsedMinutes < 30
+    ) {
 
+        taskText =
+            "Attempt active recall without looking at your notes.";
 
-    speak(
-        "Study session completed. Well done."
-    );
+    }
 
+    else {
 
-}
-
-
-// =====================================================
-// AUTOMATIC COMPLETION
-// =====================================================
-
-function completeStudySession() {
-
-    clearInterval(
-        studyTimer
-    );
-
-
-    studyRunning =
-        false;
-
-
-    studyRemainingSeconds =
-        0;
-
-
-    updateTimerDisplay();
-
-    updateProgress();
-
-
-    const sessionStatus =
-        document.getElementById(
-            "sessionStatus"
-        );
-
-
-    const currentTask =
-        document.getElementById(
-            "currentTask"
-        );
-
-
-    sessionStatus.innerText =
-        "COMPLETED";
-
-
-    currentTask.innerText =
-        "Time is up. Session completed.";
-
-
-    const response =
-        document.getElementById(
-            "response"
-        );
-
-
-    response.innerText =
-        "JARVIS: Your study session is complete. Great work.";
-
-
-    speak(
-        "Your study session is complete. Great work."
-    );
-
-}
-
-
-// =====================================================
-// FORMAT STUDY RESPONSE
-// =====================================================
-
-function formatStudyResponse(text) {
-
-    if (!text) {
-
-        return "No study plan was generated.";
+        taskText =
+            "Practise questions and check your mistakes.";
 
     }
 
 
-    let formatted =
-        text;
+    const task =
+        document.getElementById(
+            "currentTask"
+        );
 
 
-    formatted =
-        formatted
-            .replace(
-                /&/g,
-                "&amp;"
+    if (task) {
+
+        task.textContent =
+            taskText;
+
+    }
+
+}
+
+
+// =====================================================
+// HOMEWORK MANAGER
+// =====================================================
+
+function openHomework() {
+
+    const manager =
+        document.getElementById(
+            "homeworkManager"
+        );
+
+
+    if (manager) {
+
+        manager.style.display =
+            "flex";
+
+    }
+
+
+    loadHomework();
+
+}
+
+
+// =====================================================
+// CLOSE HOMEWORK
+// =====================================================
+
+function closeHomework() {
+
+    const manager =
+        document.getElementById(
+            "homeworkManager"
+        );
+
+
+    if (manager) {
+
+        manager.style.display =
+            "none";
+
+    }
+
+}
+
+
+// =====================================================
+// ADD HOMEWORK
+// =====================================================
+
+function addHomework() {
+
+    const subject =
+        document.getElementById(
+            "homeworkSubject"
+        ).value;
+
+
+    const task =
+        document.getElementById(
+            "homeworkTask"
+        ).value.trim();
+
+
+    const dueDate =
+        document.getElementById(
+            "homeworkDueDate"
+        ).value;
+
+
+    const priority =
+        document.getElementById(
+            "homeworkPriority"
+        ).value;
+
+
+    if (!task) {
+
+        alert(
+            "Please enter a homework task."
+        );
+
+        return;
+
+    }
+
+
+    const newHomework = {
+
+        id:
+            Date.now(),
+
+        subject:
+            subject,
+
+        task:
+            task,
+
+        dueDate:
+            dueDate,
+
+        priority:
+            priority,
+
+        completed:
+            false
+
+    };
+
+
+    homework.push(
+        newHomework
+    );
+
+
+    saveHomework();
+
+
+    document.getElementById(
+        "homeworkTask"
+    ).value = "";
+
+
+    document.getElementById(
+        "homeworkDueDate"
+    ).value = "";
+
+
+    loadHomework();
+
+
+    showResponse(
+        `Homework added: ${task}`
+    );
+
+}
+
+
+// =====================================================
+// SAVE HOMEWORK
+// =====================================================
+
+function saveHomework() {
+
+    localStorage.setItem(
+        "jarvisHomework",
+        JSON.stringify(
+            homework
+        )
+    );
+
+}
+
+
+// =====================================================
+// LOAD HOMEWORK
+// =====================================================
+
+function loadHomework() {
+
+    const list =
+        document.getElementById(
+            "homeworkList"
+        );
+
+
+    if (!list) {
+        return;
+    }
+
+
+    if (
+        homework.length === 0
+    ) {
+
+        list.innerHTML = `
+
+            <div class="empty-homework">
+
+                No homework tasks yet.
+
+            </div>
+
+        `;
+
+
+        updateHomeworkSummary();
+
+        return;
+
+    }
+
+
+    list.innerHTML =
+        homework
+            .map(
+                item =>
+                    createHomeworkHTML(
+                        item
+                    )
             )
-            .replace(
-                /</g,
-                "&lt;"
+            .join("");
+
+
+    updateHomeworkSummary();
+
+}
+
+
+// =====================================================
+// CREATE HOMEWORK HTML
+// =====================================================
+
+function createHomeworkHTML(
+    item
+) {
+
+    const completedClass =
+        item.completed
+            ? "completed"
+            : "";
+
+
+    const checked =
+        item.completed
+            ? "checked"
+            : "";
+
+
+    const dueText =
+        item.dueDate
+            ? formatDate(
+                item.dueDate
             )
-            .replace(
-                />/g,
-                "&gt;"
-            );
+            : "No due date";
 
 
-    formatted =
-        formatted.replace(
-            /\*\*(.*?)\*\*/g,
-            "<strong>$1</strong>"
+    return `
+
+        <div
+            class="homework-item ${completedClass}"
+        >
+
+            <div class="homework-item-main">
+
+                <label class="homework-check">
+
+                    <input
+                        type="checkbox"
+                        ${checked}
+                        onchange="toggleHomework(${item.id})"
+                    >
+
+                    <span></span>
+
+                </label>
+
+
+                <div class="homework-item-info">
+
+                    <strong>
+                        ${formatText(item.task)}
+                    </strong>
+
+                    <span>
+                        ${formatText(item.subject)}
+                    </span>
+
+                    <span>
+                        Due: ${dueText}
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="homework-item-side">
+
+                <span
+                    class="homework-priority ${item.priority.toLowerCase()}"
+                >
+
+                    ${item.priority}
+
+                </span>
+
+
+                <button
+                    onclick="deleteHomework(${item.id})"
+                    class="delete-homework"
+                    title="Delete homework"
+                >
+
+                    ×
+
+                </button>
+
+            </div>
+
+        </div>
+
+    `;
+
+}
+
+
+// =====================================================
+// TOGGLE HOMEWORK
+// =====================================================
+
+function toggleHomework(
+    id
+) {
+
+    const item =
+        homework.find(
+            homeworkItem =>
+                homeworkItem.id === id
         );
 
 
-    formatted =
-        formatted.replace(
-            /^### (.*)$/gm,
-            "<h4>$1</h4>"
+    if (!item) {
+        return;
+    }
+
+
+    item.completed =
+        !item.completed;
+
+
+    saveHomework();
+
+    loadHomework();
+
+}
+
+
+// =====================================================
+// DELETE HOMEWORK
+// =====================================================
+
+function deleteHomework(
+    id
+) {
+
+    homework =
+        homework.filter(
+            item =>
+                item.id !== id
         );
 
 
-    formatted =
-        formatted.replace(
-            /^## (.*)$/gm,
-            "<h3>$1</h3>"
+    saveHomework();
+
+    loadHomework();
+
+}
+
+
+// =====================================================
+// CLEAR COMPLETED HOMEWORK
+// =====================================================
+
+function clearCompletedHomework() {
+
+    homework =
+        homework.filter(
+            item =>
+                !item.completed
         );
 
 
-    formatted =
-        formatted.replace(
-            /^(\d+)\. (.*)$/gm,
-            "<p><strong>$1.</strong> $2</p>"
+    saveHomework();
+
+    loadHomework();
+
+}
+
+
+// =====================================================
+// HOMEWORK SUMMARY
+// =====================================================
+
+function updateHomeworkSummary() {
+
+    const count =
+        document.getElementById(
+            "homeworkCount"
         );
 
 
-    formatted =
-        formatted.replace(
-            /^[-•] (.*)$/gm,
-            "<p>• $1</p>"
+    const status =
+        document.getElementById(
+            "homeworkStatus"
         );
 
 
-    formatted =
-        formatted.replace(
-            /\n/g,
-            "<br>"
+    const incomplete =
+        homework.filter(
+            item =>
+                !item.completed
+        ).length;
+
+
+    if (count) {
+
+        count.textContent =
+            incomplete;
+
+    }
+
+
+    if (!status) {
+        return;
+    }
+
+
+    if (
+        homework.length === 0
+    ) {
+
+        status.textContent =
+            "No homework added yet.";
+
+    }
+
+    else if (
+        incomplete === 0
+    ) {
+
+        status.textContent =
+            "All homework completed.";
+
+    }
+
+    else {
+
+        status.textContent =
+            `${incomplete} homework task${incomplete === 1 ? "" : "s"} remaining.`;
+
+    }
+
+}
+
+
+// =====================================================
+// FORMAT DATE
+// =====================================================
+
+function formatDate(
+    dateString
+) {
+
+    if (!dateString) {
+
+        return "No due date";
+
+    }
+
+
+    const date =
+        new Date(
+            dateString +
+            "T00:00:00"
         );
 
 
-    return formatted;
+    return date.toLocaleDateString(
+        "en-SG",
+        {
+            day: "numeric",
+            month: "short",
+            year: "numeric"
+        }
+    );
 
 }
 
@@ -1485,41 +2159,9 @@ function formatStudyResponse(text) {
 
 function openSchedule() {
 
-    const response =
-        document.getElementById(
-            "response"
-        );
-
-
-    response.innerText =
-        "JARVIS: Calendar system detected. Google Calendar integration is coming next.";
-
-
-    speak(
-        response.innerText
-    );
-
-}
-
-
-// =====================================================
-// HOMEWORK
-// =====================================================
-
-function openHomework() {
-
-    const response =
-        document.getElementById(
-            "response"
-        );
-
-
-    response.innerText =
-        "JARVIS: Homework system activated. Your homework database has not been connected yet.";
-
-
-    speak(
-        response.innerText
+    alert(
+        "JARVIS SCHEDULE SYSTEM\n\n" +
+        "Calendar integration is coming soon."
     );
 
 }
@@ -1531,167 +2173,21 @@ function openHomework() {
 
 function openTests() {
 
-    const response =
-        document.getElementById(
-            "response"
-        );
-
-
-    response.innerText =
-        "JARVIS: Test and examination system activated. Your test database has not been connected yet.";
-
-
-    speak(
-        response.innerText
+    alert(
+        "JARVIS TEST & EXAM SYSTEM\n\n" +
+        "Test scheduling is coming soon."
     );
 
 }
 
 
 // =====================================================
-// LEGACY STUDY FUNCTION
-// =====================================================
-
-function startStudy() {
-
-    openStudyHub();
-
-}
-
-
-// =====================================================
-// VOICE RECOGNITION
-// =====================================================
-
-function startListening() {
-
-    const response =
-        document.getElementById(
-            "response"
-        );
-
-
-    const input =
-        document.getElementById(
-            "commandInput"
-        );
-
-
-    if (
-        !("webkitSpeechRecognition" in window)
-    ) {
-
-        response.innerText =
-            "JARVIS: Voice recognition is not supported by this browser.";
-
-        speak(
-            response.innerText
-        );
-
-        return;
-
-    }
-
-
-    const recognition =
-        new webkitSpeechRecognition();
-
-
-    recognition.lang =
-        "en-SG";
-
-
-    recognition.continuous =
-        false;
-
-
-    recognition.interimResults =
-        false;
-
-
-    response.innerText =
-        "JARVIS: Listening...";
-
-
-    recognition.start();
-
-
-    recognition.onresult =
-        function(event) {
-
-            const transcript =
-                event
-                    .results[0][0]
-                    .transcript;
-
-
-            input.value =
-                transcript;
-
-
-            sendCommand();
-
-        };
-
-
-    recognition.onerror =
-        function() {
-
-            response.innerText =
-                "JARVIS: I couldn't hear that. Please try again.";
-
-            speak(
-                response.innerText
-            );
-
-        };
-
-
-    recognition.onend =
-        function() {
-
-            console.log(
-                "Voice recognition ended."
-            );
-
-        };
-
-}
-
-
-// =====================================================
-// ENTER KEY
+// CLOSE MODALS WHEN CLICKING OUTSIDE
 // =====================================================
 
 document.addEventListener(
-    "DOMContentLoaded",
-    function() {
-
-        const input =
-            document.getElementById(
-                "commandInput"
-            );
-
-
-        if (input) {
-
-            input.addEventListener(
-                "keydown",
-                function(event) {
-
-                    if (
-                        event.key === "Enter"
-                    ) {
-
-                        sendCommand();
-
-                    }
-
-                }
-            );
-
-        }
-
+    "click",
+    (event) => {
 
         const studyHub =
             document.getElementById(
@@ -1699,68 +2195,30 @@ document.addEventListener(
             );
 
 
-        if (studyHub) {
-
-            studyHub.addEventListener(
-                "click",
-                function(event) {
-
-                    if (
-                        event.target ===
-                        studyHub
-                    ) {
-
-                        closeStudyHub();
-
-                    }
-
-                }
+        const homeworkManager =
+            document.getElementById(
+                "homeworkManager"
             );
+
+
+        if (
+            event.target ===
+            studyHub
+        ) {
+
+            closeStudyHub();
+
+        }
+
+
+        if (
+            event.target ===
+            homeworkManager
+        ) {
+
+            closeHomework();
 
         }
 
     }
 );
-
-
-// =====================================================
-// TEXT TO SPEECH
-// =====================================================
-
-function speak(text) {
-
-    if (
-        !("speechSynthesis" in window)
-    ) {
-
-        return;
-
-    }
-
-
-    const speech =
-        new SpeechSynthesisUtterance(
-            text
-        );
-
-
-    speech.rate =
-        1;
-
-
-    speech.pitch =
-        1;
-
-
-    speech.volume =
-        1;
-
-
-    window.speechSynthesis.cancel();
-
-
-    window.speechSynthesis.speak(
-        speech
-    );
-
-}
