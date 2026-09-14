@@ -1,1103 +1,579 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <title>J.A.R.V.I.S.</title>
 
-    <title>J.A.R.V.I.S. — Student Assistant</title>
-
-    <link
-        rel="stylesheet"
-        href="style.css"
-    >
-
+    <link rel="stylesheet" href="style.css">
 </head>
-
 
 <body>
 
-    <div class="background-grid"></div>
+<div class="scanline"></div>
 
-    <div class="scan-line"></div>
+<header>
+
+    <div class="brand">
+        <div class="brand-title">J.A.R.V.I.S.</div>
+        <div class="brand-subtitle">
+            JUST A RATHER VERY INTELLIGENT SYSTEM
+        </div>
+    </div>
+
+    <div class="system-status">
+        <span class="status-dot"></span>
+        SYSTEM ONLINE
+    </div>
+
+</header>
 
 
-    <!-- =================================================
-         HEADER
-         ================================================= -->
+<main>
 
-    <header>
+    <!-- JARVIS CORE -->
 
-        <div class="logo">
+    <section class="core-section">
 
-            J.A.R.V.I.S.
+        <div class="jarvis-core">
 
-            <span class="subtitle">
-                PERSONAL AI SYSTEM
-            </span>
+            <div class="core-ring ring-one"></div>
+            <div class="core-ring ring-two"></div>
+            <div class="core-ring ring-three"></div>
+
+            <div class="core-center">
+                J
+            </div>
 
         </div>
 
-
-        <div class="system-status">
-
-            <span class="status-dot">
-                ●
-            </span>
-
-            SYSTEM ONLINE
-
+        <div id="voiceStatus" class="voice-status">
+            VOICE SYSTEM INITIALISING...
         </div>
 
-    </header>
+    </section>
 
 
+    <!-- COMMAND -->
 
-    <!-- =================================================
-         MAIN
-         ================================================= -->
+    <section class="command-section">
 
-    <main>
+        <div class="command-box">
 
-
-        <!-- =================================================
-             CENTRAL JARVIS PANEL
-             ================================================= -->
-
-        <section class="main-panel">
-
-            <div class="small-text">
-
-                JUST A RATHER VERY INTELLIGENT SYSTEM
-
-            </div>
-
-
-            <!-- JARVIS CORE -->
-
-            <div class="core">
-
-                <div class="core-ring ring-one"></div>
-
-                <div class="core-ring ring-two"></div>
-
-                <div class="core-ring ring-three"></div>
-
-                <div class="core-ring ring-four"></div>
-
-
-                <div class="core-center">
-
-                    <span>
-                        J
-                    </span>
-
-                </div>
-
-            </div>
-
-
-            <div class="ready">
-
-                <span class="status-indicator">
-                    ●
-                </span>
-
-                READY FOR COMMAND
-
-            </div>
-
-
-
-            <!-- =================================================
-                 COMMAND AREA
-                 Voice button removed.
-                 Automatic voice will be handled by script.js.
-                 ================================================= -->
-
-            <div class="command-area">
-
-                <input
-                    id="commandInput"
-                    type="text"
-                    placeholder="Ask JARVIS anything..."
-                    autocomplete="off"
-                >
-
-
-                <button
-                    onclick="sendCommand()"
-                    class="send-button"
-                >
-
-                    SEND
-
-                </button>
-
-            </div>
-
-
-
-            <!-- =================================================
-                 AI RESPONSE
-                 ================================================= -->
-
-            <div
-                id="response"
-                class="response-box"
+            <input
+                id="commandInput"
+                type="text"
+                placeholder="Enter a command..."
+                autocomplete="off"
             >
 
-                <span class="response-label">
-                    JARVIS
-                </span>
+            <button onclick="sendCommand()">
+                SEND
+            </button>
 
-                <span class="response-text">
-                    Initialising JARVIS...
-                </span>
+        </div>
 
+    </section>
+
+
+    <!-- RESPONSE -->
+
+    <section class="response-section">
+
+        <div class="section-title">
+            JARVIS RESPONSE
+        </div>
+
+        <div id="responseBox" class="response-box">
+            Awaiting command...
+        </div>
+
+    </section>
+
+
+    <!-- DASHBOARD -->
+
+    <section class="dashboard">
+
+        <!-- SYSTEM -->
+
+        <div class="panel system-panel">
+
+            <div class="panel-title">
+                SYSTEM
             </div>
 
-        </section>
+            <div class="system-info">
 
-
-
-        <!-- =================================================
-             DASHBOARD
-             ================================================= -->
-
-        <section class="dashboard">
-
-
-            <!-- =================================================
-                 SYSTEM
-                 ================================================= -->
-
-            <div class="panel system-panel">
-
-                <div class="panel-header">
-
-                    <span class="panel-icon">
-                        ◉
-                    </span>
-
-                    <h2>
-                        SYSTEM
-                    </h2>
-
+                <div>
+                    <span>AI CORE</span>
+                    <strong id="aiStatus">READY</strong>
                 </div>
 
+                <div>
+                    <span>VOICE</span>
+                    <strong id="voicePanelStatus">READY</strong>
+                </div>
 
-                <div class="system-data">
-
-                    <div>
-
-                        <span>
-                            AI CORE
-                        </span>
-
-                        <strong>
-                            ONLINE
-                        </strong>
-
-                    </div>
-
-
-                    <div>
-
-                        <span>
-                            MEMORY
-                        </span>
-
-                        <strong>
-                            ACTIVE
-                        </strong>
-
-                    </div>
-
-
-                    <div>
-
-                        <span>
-                            VOICE
-                        </span>
-
-                        <strong>
-                            AUTO
-                        </strong>
-
-                    </div>
-
+                <div>
+                    <span>MEMORY</span>
+                    <strong id="memoryCount">0</strong>
                 </div>
 
             </div>
 
+        </div>
 
 
-            <!-- =================================================
-                 SCHEDULE
-                 ================================================= -->
+        <!-- SCHEDULE -->
 
-            <div class="panel">
+        <div class="panel clickable" onclick="openSchedule()">
 
-                <div class="panel-header">
-
-                    <span class="panel-icon">
-                        ◷
-                    </span>
-
-                    <h2>
-                        SCHEDULE
-                    </h2>
-
-                </div>
-
-
-                <p>
-                    No schedule loaded.
-                </p>
-
-
-                <button
-                    onclick="openSchedule()"
-                >
-
-                    OPEN CALENDAR
-
-                </button>
-
+            <div class="panel-title">
+                SCHEDULE
             </div>
 
-
-
-            <!-- =================================================
-                 STUDY HUB
-                 ================================================= -->
-
-            <div class="panel study-panel">
-
-                <div class="panel-header">
-
-                    <span class="panel-icon">
-                        ▣
-                    </span>
-
-                    <h2>
-                        STUDY HUB
-                    </h2>
-
-                </div>
-
-
-                <p>
-                    Generate and run a personalised study session.
-                </p>
-
-
-                <button
-                    onclick="openStudyHub()"
-                >
-
-                    OPEN STUDY HUB
-
-                </button>
-
+            <div id="scheduleSummary">
+                No events scheduled.
             </div>
 
+            <button class="panel-button">
+                OPEN SCHEDULE
+            </button>
+
+        </div>
 
 
-            <!-- =================================================
-                 HOMEWORK
-                 ================================================= -->
+        <!-- STUDY HUB -->
 
-            <div class="panel homework-panel">
+        <div class="panel clickable" onclick="openStudyHub()">
 
-                <div class="panel-header">
-
-                    <span class="panel-icon">
-                        ✓
-                    </span>
-
-                    <h2>
-                        HOMEWORK
-                    </h2>
-
-                </div>
-
-
-                <div
-                    id="homeworkSummary"
-                    class="homework-summary"
-                >
-
-                    <strong id="homeworkCount">
-                        0
-                    </strong>
-
-                    <span>
-                        TASKS
-                    </span>
-
-                </div>
-
-
-                <p id="homeworkStatus">
-
-                    No homework added yet.
-
-                </p>
-
-
-                <button
-                    onclick="openHomework()"
-                >
-
-                    OPEN HOMEWORK MANAGER
-
-                </button>
-
+            <div class="panel-title">
+                STUDY HUB
             </div>
 
-
-
-            <!-- =================================================
-                 TESTS & EXAMS
-                 ================================================= -->
-
-            <div class="panel">
-
-                <div class="panel-header">
-
-                    <span class="panel-icon">
-                        !
-                    </span>
-
-                    <h2>
-                        TESTS & EXAMS
-                    </h2>
-
-                </div>
-
-
-                <p>
-                    No tests loaded.
-                </p>
-
-
-                <button
-                    onclick="openTests()"
-                >
-
-                    VIEW TESTS
-
-                </button>
-
+            <div>
+                Create focused study sessions.
             </div>
 
+            <button class="panel-button">
+                OPEN STUDY HUB
+            </button>
+
+        </div>
 
 
-            <!-- =================================================
-                 MEMORY
-                 ================================================= -->
+        <!-- HOMEWORK -->
 
-            <div class="panel memory-panel">
+        <div class="panel clickable" onclick="openHomework()">
 
-                <div class="panel-header">
-
-                    <span class="panel-icon">
-                        🧠
-                    </span>
-
-                    <h2>
-                        JARVIS MEMORY
-                    </h2>
-
-                </div>
-
-
-                <p>
-                    Saved preferences and information.
-                </p>
-
-
-                <button
-                    onclick="openMemory()"
-                >
-
-                    VIEW MEMORY
-
-                </button>
-
+            <div class="panel-title">
+                HOMEWORK
             </div>
 
-        </section>
+            <div id="homeworkSummary">
+                No homework yet.
+            </div>
+
+            <button class="panel-button">
+                OPEN HOMEWORK
+            </button>
+
+        </div>
 
 
+        <!-- TESTS -->
 
-        <!-- =================================================
-             STUDY HUB
-             ================================================= -->
+        <div class="panel clickable" onclick="openTests()">
 
-        <section
-            id="studyHub"
-            class="study-hub"
+            <div class="panel-title">
+                TESTS & EXAMS
+            </div>
+
+            <div id="testSummary">
+                No tests scheduled.
+            </div>
+
+            <button class="panel-button">
+                OPEN TESTS
+            </button>
+
+        </div>
+
+
+        <!-- MEMORY -->
+
+        <div class="panel clickable" onclick="openMemory()">
+
+            <div class="panel-title">
+                MEMORY
+            </div>
+
+            <div>
+                JARVIS remembers useful information.
+            </div>
+
+            <button class="panel-button">
+                VIEW MEMORY
+            </button>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<!-- =========================
+     STUDY HUB MODAL
+========================= -->
+
+<div id="studyModal" class="modal">
+
+    <div class="modal-content">
+
+        <button class="close-button" onclick="closeStudyHub()">
+            ×
+        </button>
+
+        <h2>STUDY HUB</h2>
+
+        <label>Subject</label>
+
+        <select id="studySubject">
+
+            <option>Physics</option>
+            <option>Chemistry</option>
+            <option>Mathematics</option>
+            <option>English</option>
+            <option>Social Studies</option>
+            <option>Tamil</option>
+            <option>Other</option>
+
+        </select>
+
+
+        <label>Topic</label>
+
+        <input
+            id="studyTopic"
+            placeholder="e.g. Pressure"
         >
 
-            <div class="study-hub-box">
 
+        <label>Duration</label>
 
-                <!-- STUDY HEADER -->
+        <select id="studyDuration">
 
-                <div class="study-hub-header">
+            <option value="25">25 minutes</option>
+            <option value="45">45 minutes</option>
+            <option value="60">60 minutes</option>
+            <option value="90">90 minutes</option>
 
-                    <div>
+        </select>
 
-                        <div class="small-text">
-                            J.A.R.V.I.S.
-                        </div>
 
-                        <h2>
-                            STUDY HUB
-                        </h2>
+        <label>Goal</label>
 
-                    </div>
+        <select id="studyGoal">
 
+            <option>Learn the topic</option>
+            <option>Revise concepts</option>
+            <option>Practise questions</option>
+            <option>Prepare for a test</option>
 
-                    <button
-                        onclick="closeStudyHub()"
-                        class="close-button"
-                    >
+        </select>
 
-                        ×
 
-                    </button>
+        <button class="primary-button" onclick="generateStudySession()">
+            GENERATE SESSION
+        </button>
 
-                </div>
 
+        <div id="studySession" class="study-session hidden">
 
+            <h3>ACTIVE STUDY SESSION</h3>
 
-                <p class="study-description">
+            <div id="timerDisplay" class="timer">
+                25:00
+            </div>
 
-                    Configure your study session and let JARVIS
-                    build a personalised revision plan.
+            <div class="progress-container">
 
-                </p>
+                <div id="progressFill" class="progress-fill"></div>
 
+            </div>
 
+            <div id="progressText">
+                0%
+            </div>
 
-                <!-- SUBJECT -->
+            <div class="current-task">
 
-                <div class="study-field">
+                <span>CURRENT TASK</span>
 
-                    <label for="studySubject">
-                        SUBJECT
-                    </label>
+                <strong id="currentTask">
+                    Preparing...
+                </strong>
 
+            </div>
 
-                    <select id="studySubject">
 
-                        <option value="Physics">
-                            Physics
-                        </option>
+            <div class="session-controls">
 
-                        <option value="Chemistry">
-                            Chemistry
-                        </option>
-
-                        <option value="Mathematics">
-                            Mathematics
-                        </option>
-
-                        <option value="Social Studies">
-                            Social Studies
-                        </option>
-
-                        <option value="English">
-                            English
-                        </option>
-
-                        <option value="Tamil">
-                            Tamil
-                        </option>
-
-                        <option value="Other">
-                            Other
-                        </option>
-
-                    </select>
-
-                </div>
-
-
-
-                <!-- TOPIC -->
-
-                <div class="study-field">
-
-                    <label for="studyTopic">
-                        TOPIC
-                    </label>
-
-
-                    <input
-                        id="studyTopic"
-                        type="text"
-                        placeholder="e.g. Turning Effects of Forces"
-                    >
-
-                </div>
-
-
-
-                <!-- DURATION -->
-
-                <div class="study-field">
-
-                    <label for="studyDuration">
-                        STUDY DURATION
-                    </label>
-
-
-                    <select id="studyDuration">
-
-                        <option value="25">
-                            25 minutes
-                        </option>
-
-                        <option value="45">
-                            45 minutes
-                        </option>
-
-                        <option value="60">
-                            1 hour
-                        </option>
-
-                        <option value="90">
-                            1.5 hours
-                        </option>
-
-                        <option value="120">
-                            2 hours
-                        </option>
-
-                    </select>
-
-                </div>
-
-
-
-                <!-- GOAL -->
-
-                <div class="study-field">
-
-                    <label for="studyGoal">
-                        STUDY GOAL
-                    </label>
-
-
-                    <select id="studyGoal">
-
-                        <option value="Learn the topic">
-                            Learn the topic
-                        </option>
-
-                        <option value="Revise">
-                            Revise
-                        </option>
-
-                        <option value="Prepare for a test">
-                            Prepare for a test
-                        </option>
-
-                        <option value="Practise questions">
-                            Practise questions
-                        </option>
-
-                        <option value="Memorise key concepts">
-                            Memorise key concepts
-                        </option>
-
-                    </select>
-
-                </div>
-
-
-
-                <!-- GENERATE -->
-
-                <button
-                    onclick="generateStudySession()"
-                    class="study-start-button"
-                >
-
-                    GENERATE STUDY SESSION
-
+                <button onclick="startTimer()">
+                    START
                 </button>
 
-
-
-                <!-- STUDY RESULT -->
-
-                <div
-                    id="studyResult"
-                    class="study-result"
-                >
-
-                    <div class="response-label">
-                        JARVIS STUDY SYSTEM
-                    </div>
-
-                    <p>
-                        Configure your session above.
-                    </p>
-
-                </div>
-
-
-
-                <!-- =================================================
-                     ACTIVE STUDY SESSION
-                     ================================================= -->
-
-                <div
-                    id="activeStudySession"
-                    class="active-study-session"
-                >
-
-
-                    <div class="session-header">
-
-                        <div>
-
-                            <div class="response-label">
-                                ACTIVE STUDY SESSION
-                            </div>
-
-                            <h3 id="sessionSubject">
-                                —
-                            </h3>
-
-                            <p id="sessionTopic">
-                                —
-                            </p>
-
-                        </div>
-
-
-                        <div
-                            id="sessionStatus"
-                            class="session-status"
-                        >
-
-                            READY
-
-                        </div>
-
-                    </div>
-
-
-
-                    <!-- TIMER -->
-
-                    <div class="study-timer">
-
-                        <div
-                            id="timerDisplay"
-                            class="timer-display"
-                        >
-
-                            00:00
-
-                        </div>
-
-
-                        <div class="timer-label">
-
-                            REMAINING
-
-                        </div>
-
-                    </div>
-
-
-
-                    <!-- PROGRESS -->
-
-                    <div class="progress-section">
-
-                        <div class="progress-info">
-
-                            <span>
-                                SESSION PROGRESS
-                            </span>
-
-                            <span
-                                id="progressPercent"
-                            >
-                                0%
-                            </span>
-
-                        </div>
-
-
-                        <div class="progress-bar">
-
-                            <div
-                                id="progressFill"
-                                class="progress-fill"
-                            ></div>
-
-                        </div>
-
-                    </div>
-
-
-
-                    <!-- CURRENT TASK -->
-
-                    <div class="current-task">
-
-                        <div class="response-label">
-                            CURRENT TASK
-                        </div>
-
-
-                        <div id="currentTask">
-
-                            Prepare to begin.
-
-                        </div>
-
-                    </div>
-
-
-
-                    <!-- CONTROLS -->
-
-                    <div class="session-controls">
-
-                        <button
-                            onclick="startTimer()"
-                            id="startTimerButton"
-                        >
-
-                            ▶ START
-
-                        </button>
-
-
-                        <button
-                            onclick="pauseTimer()"
-                        >
-
-                            ⏸ PAUSE
-
-                        </button>
-
-
-                        <button
-                            onclick="resetTimer()"
-                        >
-
-                            ↻ RESET
-
-                        </button>
-
-
-                        <button
-                            onclick="finishStudySession()"
-                        >
-
-                            ✓ FINISH
-
-                        </button>
-
-                    </div>
-
-
-                </div>
+                <button onclick="pauseTimer()">
+                    PAUSE
+                </button>
+
+                <button onclick="resetTimer()">
+                    RESET
+                </button>
+
+                <button onclick="finishSession()">
+                    FINISH
+                </button>
 
             </div>
 
-        </section>
+        </div>
+
+    </div>
+
+</div>
 
 
+<!-- =========================
+     HOMEWORK MODAL
+========================= -->
 
-        <!-- =================================================
-             HOMEWORK MANAGER
-             ================================================= -->
+<div id="homeworkModal" class="modal">
 
-        <section
-            id="homeworkManager"
-            class="homework-manager"
+    <div class="modal-content">
+
+        <button class="close-button" onclick="closeHomework()">
+            ×
+        </button>
+
+        <h2>HOMEWORK MANAGER</h2>
+
+
+        <label>Subject</label>
+
+        <input
+            id="homeworkSubject"
+            placeholder="e.g. Chemistry"
         >
 
-            <div class="homework-manager-box">
 
+        <label>Homework</label>
 
-                <!-- HEADER -->
+        <input
+            id="homeworkTask"
+            placeholder="e.g. Complete worksheet"
+        >
 
-                <div class="homework-manager-header">
 
-                    <div>
+        <label>Due Date</label>
 
-                        <div class="small-text">
-                            J.A.R.V.I.S.
-                        </div>
+        <input
+            id="homeworkDue"
+            type="date"
+        >
 
-                        <h2>
-                            HOMEWORK MANAGER
-                        </h2>
 
-                    </div>
+        <label>Priority</label>
 
+        <select id="homeworkPriority">
 
-                    <button
-                        onclick="closeHomework()"
-                        class="close-button"
-                    >
+            <option value="Low">Low</option>
+            <option value="Medium" selected>Medium</option>
+            <option value="High">High</option>
 
-                        ×
+        </select>
 
-                    </button>
 
-                </div>
+        <button class="primary-button" onclick="addHomework()">
+            ADD HOMEWORK
+        </button>
 
 
+        <div id="homeworkList" class="homework-list"></div>
 
-                <p class="homework-description">
 
-                    Organise your assignments, track deadlines
-                    and stay on top of your schoolwork.
+        <button
+            class="secondary-button"
+            onclick="clearCompletedHomework()"
+        >
+            CLEAR COMPLETED
+        </button>
 
-                </p>
+    </div>
 
+</div>
 
 
-                <!-- =================================================
-                     ADD HOMEWORK
-                     ================================================= -->
+<!-- =========================
+     SCHEDULE MODAL
+========================= -->
 
-                <div class="homework-add-section">
+<div id="scheduleModal" class="modal">
 
-                    <div class="response-label">
-                        ADD HOMEWORK
-                    </div>
+    <div class="modal-content">
 
+        <button class="close-button" onclick="closeSchedule()">
+            ×
+        </button>
 
+        <h2>SCHEDULE</h2>
 
-                    <!-- SUBJECT -->
+        <label>Event</label>
 
-                    <div class="homework-field">
+        <input
+            id="scheduleEvent"
+            placeholder="e.g. Indian Dance CCA"
+        >
 
-                        <label for="homeworkSubject">
-                            SUBJECT
-                        </label>
 
+        <label>Date</label>
 
-                        <select id="homeworkSubject">
+        <input
+            id="scheduleDate"
+            type="date"
+        >
 
-                            <option value="Physics">
-                                Physics
-                            </option>
 
-                            <option value="Chemistry">
-                                Chemistry
-                            </option>
+        <label>Time</label>
 
-                            <option value="Mathematics">
-                                Mathematics
-                            </option>
+        <input
+            id="scheduleTime"
+            type="time"
+        >
 
-                            <option value="Social Studies">
-                                Social Studies
-                            </option>
 
-                            <option value="English">
-                                English
-                            </option>
+        <label>Type</label>
 
-                            <option value="Tamil">
-                                Tamil
-                            </option>
+        <select id="scheduleType">
 
-                            <option value="Other">
-                                Other
-                            </option>
+            <option>School</option>
+            <option>CCA</option>
+            <option>Tuition</option>
+            <option>Study</option>
+            <option>Personal</option>
 
-                        </select>
+        </select>
 
-                    </div>
 
+        <button class="primary-button" onclick="addScheduleEvent()">
+            ADD EVENT
+        </button>
 
 
-                    <!-- TASK -->
+        <div id="scheduleList" class="schedule-list"></div>
 
-                    <div class="homework-field">
+    </div>
 
-                        <label for="homeworkTask">
-                            HOMEWORK TASK
-                        </label>
+</div>
 
 
-                        <input
-                            id="homeworkTask"
-                            type="text"
-                            placeholder="e.g. Complete Physics worksheet"
-                        >
+<!-- =========================
+     TEST MODAL
+========================= -->
 
-                    </div>
+<div id="testsModal" class="modal">
 
+    <div class="modal-content">
 
+        <button class="close-button" onclick="closeTests()">
+            ×
+        </button>
 
-                    <!-- DATE + PRIORITY -->
+        <h2>TESTS & EXAMS</h2>
 
-                    <div class="homework-row">
+        <label>Subject</label>
 
+        <input
+            id="testSubject"
+            placeholder="e.g. Physics"
+        >
 
-                        <div class="homework-field">
 
-                            <label for="homeworkDueDate">
-                                DUE DATE
-                            </label>
+        <label>Test / Exam</label>
 
+        <input
+            id="testName"
+            placeholder="e.g. EOY Examination"
+        >
 
-                            <input
-                                id="homeworkDueDate"
-                                type="date"
-                            >
 
-                        </div>
+        <label>Date</label>
 
+        <input
+            id="testDate"
+            type="date"
+        >
 
 
-                        <div class="homework-field">
+        <label>Topics</label>
 
-                            <label for="homeworkPriority">
-                                PRIORITY
-                            </label>
+        <input
+            id="testTopics"
+            placeholder="e.g. Pressure, Energy"
+        >
 
 
-                            <select id="homeworkPriority">
+        <button class="primary-button" onclick="addTest()">
+            ADD TEST
+        </button>
 
-                                <option value="Low">
-                                    Low
-                                </option>
 
-                                <option
-                                    value="Medium"
-                                    selected
-                                >
-                                    Medium
-                                </option>
+        <div id="testList" class="test-list"></div>
 
-                                <option value="High">
-                                    High
-                                </option>
+    </div>
 
-                            </select>
+</div>
 
-                        </div>
 
-                    </div>
+<!-- =========================
+     MEMORY MODAL
+========================= -->
 
+<div id="memoryModal" class="modal">
 
+    <div class="modal-content">
 
-                    <!-- ADD BUTTON -->
+        <button class="close-button" onclick="closeMemory()">
+            ×
+        </button>
 
-                    <button
-                        onclick="addHomework()"
-                        class="homework-add-button"
-                    >
+        <h2>MEMORY CENTRE</h2>
 
-                        + ADD HOMEWORK
+        <div id="memoryList"></div>
 
-                    </button>
+        <button
+            class="secondary-button"
+            onclick="clearMemory()"
+        >
+            CLEAR ALL MEMORY
+        </button>
 
-                </div>
+    </div>
 
+</div>
 
 
-                <!-- =================================================
-                     HOMEWORK LIST
-                     ================================================= -->
+<footer>
 
-                <div class="homework-list-section">
+    J.A.R.V.I.S. — PROTOTYPE 8.5
 
+</footer>
 
-                    <div class="homework-list-header">
 
-                        <div class="response-label">
-                            YOUR HOMEWORK
-                        </div>
-
-
-                        <button
-                            onclick="clearCompletedHomework()"
-                            class="small-action-button"
-                        >
-
-                            CLEAR COMPLETED
-
-                        </button>
-
-                    </div>
-
-
-
-                    <div
-                        id="homeworkList"
-                        class="homework-list"
-                    >
-
-                        <div class="empty-homework">
-
-                            No homework tasks yet.
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </section>
-
-    </main>
-
-
-
-    <!-- =================================================
-         FOOTER
-         ================================================= -->
-
-    <footer>
-
-        J.A.R.V.I.S.
-
-        <span>•</span>
-
-        PERSONAL STUDENT ASSISTANT
-
-        <span>•</span>
-
-        PROTOTYPE 8
-
-    </footer>
-
-
-
-    <!-- =================================================
-         JAVASCRIPT
-         ================================================= -->
-
-    <script src="script.js"></script>
+<script src="script.js"></script>
 
 </body>
-
 </html>
