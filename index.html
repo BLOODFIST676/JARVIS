@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>JARVIS</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="jarvis">
+        <h1>J.A.R.V.I.S.</h1>
+        <p>JUST A RATHER VERY INTELLIGENT SYSTEM</p>
+
+        <div class="status">
+            SYSTEM ONLINE
+        </div>
+
+        <div class="core">
+            ◉
+        </div>
+
+        <p class="command-status">
+            Ready for command.
+        </p>
+
+        <input
+            id="commandInput"
+            type="text"
+            placeholder="Give JARVIS a command..."
+        >
+
+        <button onclick="sendCommand()">
+            SEND COMMAND
+        </button>
+
+        <div id="response">
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+
+</body>
+</html>
