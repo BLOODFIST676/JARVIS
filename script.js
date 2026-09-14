@@ -99,12 +99,57 @@ function sendCommand() {
 function startListening() {
 
     const response = document.getElementById("response");
+    const input = document.getElementById("commandInput");
+
+    if (!("webkitSpeechRecognition" in window)) {
+
+        response.innerText =
+            "JARVIS: Voice recognition is not supported by this browser.";
+
+        return;
+    }
+
+    const recognition = new webkitSpeechRecognition();
+
+    recognition.lang = "en-SG";
+    recognition.continuous = false;
+    recognition.interimResults = false;
 
     response.innerText =
-        "JARVIS: Voice interface will be activated soon.";
+        "JARVIS: Listening...";
+
+    recognition.start();
+
+
+    recognition.onresult = function(event) {
+
+        const transcript =
+            event.results[0][0].transcript;
+
+        input.value = transcript;
+
+        response.innerText =
+            "JARVIS: Command received. Processing...";
+
+        sendCommand();
+    };
+
+
+    recognition.onerror = function() {
+
+        response.innerText =
+            "JARVIS: I couldn't hear that. Please try again.";
+
+    };
+
+
+    recognition.onend = function() {
+
+        console.log("Voice recognition ended.");
+
+    };
 
 }
-
 
 function openSchedule() {
 
