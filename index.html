@@ -69,7 +69,7 @@
 
 
         <!-- ===================================== -->
-        <!-- CENTRAL JARVIS CORE -->
+        <!-- CENTRAL JARVIS PANEL -->
         <!-- ===================================== -->
 
         <section class="main-panel">
@@ -118,7 +118,7 @@
             </div>
 
 
-            <!-- COMMAND BOX -->
+            <!-- COMMAND AREA -->
 
             <div class="command-area">
 
@@ -203,6 +203,7 @@
                 <div class="system-data">
 
                     <div>
+
                         <span>
                             AI CORE
                         </span>
@@ -210,10 +211,12 @@
                         <strong>
                             ONLINE
                         </strong>
+
                     </div>
 
 
                     <div>
+
                         <span>
                             MEMORY
                         </span>
@@ -221,10 +224,12 @@
                         <strong>
                             ACTIVE
                         </strong>
+
                     </div>
 
 
                     <div>
+
                         <span>
                             VOICE
                         </span>
@@ -232,6 +237,7 @@
                         <strong>
                             READY
                         </strong>
+
                     </div>
 
                 </div>
@@ -277,10 +283,10 @@
 
 
             <!-- ================================= -->
-            <!-- STUDY -->
+            <!-- STUDY HUB -->
             <!-- ================================= -->
 
-            <div class="panel">
+            <div class="panel study-panel">
 
                 <div class="panel-header">
 
@@ -296,15 +302,15 @@
 
 
                 <p>
-                    Ready to assist with your studies.
+                    Generate a personalised study session with JARVIS.
                 </p>
 
 
                 <button
-                    onclick="startStudy()"
+                    onclick="openStudyHub()"
                 >
 
-                    START STUDY MODE
+                    OPEN STUDY HUB
 
                 </button>
 
@@ -336,7 +342,9 @@
                 </p>
 
 
-                <button>
+                <button
+                    onclick="openHomework()"
+                >
 
                     VIEW HOMEWORK
 
@@ -370,7 +378,9 @@
                 </p>
 
 
-                <button>
+                <button
+                    onclick="openTests()"
+                >
 
                     VIEW TESTS
 
@@ -400,13 +410,237 @@
 
 
                 <p>
-                    Your saved preferences and information are stored locally in your browser.
+                    Saved preferences and information.
                 </p>
 
 
-               <button onclick="openMemory()">
-    VIEW MEMORY
-</button>
+                <button
+                    onclick="openMemory()"
+                >
+
+                    VIEW MEMORY
+
+                </button>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ===================================== -->
+        <!-- STUDY HUB MODAL -->
+        <!-- ===================================== -->
+
+        <section
+            id="studyHub"
+            class="study-hub"
+        >
+
+            <div class="study-hub-box">
+
+
+                <div class="study-hub-header">
+
+                    <div>
+
+                        <div class="small-text">
+                            J.A.R.V.I.S.
+                        </div>
+
+                        <h2>
+                            STUDY HUB
+                        </h2>
+
+                    </div>
+
+
+                    <button
+                        onclick="closeStudyHub()"
+                        class="close-button"
+                    >
+
+                        ×
+
+                    </button>
+
+                </div>
+
+
+                <p class="study-description">
+
+                    Configure your study session and let JARVIS help you get started.
+
+                </p>
+
+
+
+                <!-- SUBJECT -->
+
+                <div class="study-field">
+
+                    <label for="studySubject">
+                        SUBJECT
+                    </label>
+
+
+                    <select id="studySubject">
+
+                        <option value="Physics">
+                            Physics
+                        </option>
+
+                        <option value="Chemistry">
+                            Chemistry
+                        </option>
+
+                        <option value="Mathematics">
+                            Mathematics
+                        </option>
+
+                        <option value="Social Studies">
+                            Social Studies
+                        </option>
+
+                        <option value="English">
+                            English
+                        </option>
+
+                        <option value="Tamil">
+                            Tamil
+                        </option>
+
+                        <option value="Other">
+                            Other
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+
+                <!-- TOPIC -->
+
+                <div class="study-field">
+
+                    <label for="studyTopic">
+                        TOPIC
+                    </label>
+
+
+                    <input
+                        id="studyTopic"
+                        type="text"
+                        placeholder="e.g. Turning Effects of Forces"
+                    >
+
+                </div>
+
+
+
+                <!-- DURATION -->
+
+                <div class="study-field">
+
+                    <label for="studyDuration">
+                        STUDY DURATION
+                    </label>
+
+
+                    <select id="studyDuration">
+
+                        <option value="25">
+                            25 minutes
+                        </option>
+
+                        <option value="45">
+                            45 minutes
+                        </option>
+
+                        <option value="60">
+                            1 hour
+                        </option>
+
+                        <option value="90">
+                            1.5 hours
+                        </option>
+
+                        <option value="120">
+                            2 hours
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+
+                <!-- GOAL -->
+
+                <div class="study-field">
+
+                    <label for="studyGoal">
+                        STUDY GOAL
+                    </label>
+
+
+                    <select id="studyGoal">
+
+                        <option value="Learn the topic">
+                            Learn the topic
+                        </option>
+
+                        <option value="Revise">
+                            Revise
+                        </option>
+
+                        <option value="Prepare for a test">
+                            Prepare for a test
+                        </option>
+
+                        <option value="Practise questions">
+                            Practise questions
+                        </option>
+
+                        <option value="Memorise key concepts">
+                            Memorise key concepts
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+
+                <!-- START -->
+
+                <button
+                    onclick="generateStudySession()"
+                    class="study-start-button"
+                >
+
+                    INITIALISE STUDY SESSION
+
+                </button>
+
+
+                <!-- RESULT -->
+
+                <div
+                    id="studyResult"
+                    class="study-result"
+                >
+
+                    <div class="response-label">
+                        JARVIS STUDY SYSTEM
+                    </div>
+
+                    <p>
+                        Configure your session above.
+                    </p>
+
+                </div>
 
             </div>
 
@@ -423,10 +657,14 @@
     <footer>
 
         J.A.R.V.I.S.
+
         <span>•</span>
+
         PERSONAL STUDENT ASSISTANT
+
         <span>•</span>
-        PROTOTYPE 5
+
+        PROTOTYPE 6
 
     </footer>
 
