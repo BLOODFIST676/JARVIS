@@ -1,6 +1,6 @@
 // =====================================================
 // JARVIS - MAIN SCRIPT
-// AI CONVERSATION + MEMORY + VOICE + STUDY HUB
+// AI + MEMORY + VOICE + STUDY HUB + STUDY TIMER
 // =====================================================
 
 
@@ -12,13 +12,37 @@ let conversationHistory = [];
 
 
 // =====================================================
-// PERSISTENT JARVIS MEMORY
+// PERSISTENT MEMORY
 // =====================================================
 
 let jarvisMemory =
     JSON.parse(
         localStorage.getItem("jarvisMemory") || "[]"
     );
+
+
+// =====================================================
+// STUDY SESSION VARIABLES
+// =====================================================
+
+let studyTimer = null;
+
+let studyTotalSeconds = 0;
+
+let studyRemainingSeconds = 0;
+
+let studyRunning = false;
+
+let studyStartTime = null;
+
+
+// =====================================================
+// STUDY TASKS
+// =====================================================
+
+let studyTasks = [];
+
+let currentTaskIndex = 0;
 
 
 // =====================================================
@@ -108,10 +132,6 @@ function sendCommand() {
         document.getElementById("response");
 
 
-    // =================================================
-    // EMPTY COMMAND
-    // =================================================
-
     if (command === "") {
 
         response.innerText =
@@ -124,9 +144,7 @@ function sendCommand() {
     }
 
 
-    // =================================================
-    // REMEMBER SOMETHING
-    // =================================================
+    // REMEMBER
 
     if (
         lowerCommand.startsWith("remember that ") ||
@@ -164,22 +182,12 @@ function sendCommand() {
     }
 
 
-    // =================================================
-    // FORGET EVERYTHING
-    // =================================================
+    // CLEAR MEMORY
 
     if (
-        lowerCommand.includes(
-            "forget everything"
-        ) ||
-
-        lowerCommand.includes(
-            "clear my memory"
-        ) ||
-
-        lowerCommand.includes(
-            "erase my memory"
-        )
+        lowerCommand.includes("forget everything") ||
+        lowerCommand.includes("clear my memory") ||
+        lowerCommand.includes("erase my memory")
     ) {
 
         clearMemory();
@@ -196,22 +204,12 @@ function sendCommand() {
     }
 
 
-    // =================================================
     // SHOW MEMORY
-    // =================================================
 
     if (
-        lowerCommand.includes(
-            "what do you remember"
-        ) ||
-
-        lowerCommand.includes(
-            "show my memory"
-        ) ||
-
-        lowerCommand.includes(
-            "what do you know about me"
-        )
+        lowerCommand.includes("what do you remember") ||
+        lowerCommand.includes("show my memory") ||
+        lowerCommand.includes("what do you know about me")
     ) {
 
         openMemory();
@@ -223,9 +221,7 @@ function sendCommand() {
     }
 
 
-    // =================================================
-    // OPEN STUDY HUB
-    // =================================================
+    // STUDY HUB
 
     if (
         lowerCommand === "study" ||
@@ -243,32 +239,16 @@ function sendCommand() {
     }
 
 
-    // =================================================
     // SCHEDULE
-    // =================================================
 
     if (
-        lowerCommand.includes(
-            "schedule"
-        ) ||
-
-        lowerCommand.includes(
-            "calendar"
-        ) ||
-
-        lowerCommand.includes(
-            "what do i have today"
-        ) ||
-
-        lowerCommand.includes(
-            "what's on today"
-        )
+        lowerCommand.includes("schedule") ||
+        lowerCommand.includes("calendar") ||
+        lowerCommand.includes("what do i have today") ||
+        lowerCommand.includes("what's on today")
     ) {
 
-        response.innerText =
-            "JARVIS: Accessing your schedule. Google Calendar integration is not connected yet.";
-
-        speak(response.innerText);
+        openSchedule();
 
         input.value = "";
 
@@ -277,34 +257,14 @@ function sendCommand() {
     }
 
 
-    // =================================================
-    // STUDY REQUEST
-    // =================================================
+    // STUDY REQUESTS
 
     if (
-        lowerCommand.includes(
-            "study"
-        ) ||
-
-        lowerCommand.includes(
-            "revise"
-        ) ||
-
-        lowerCommand.includes(
-            "revision"
-        ) ||
-
-        lowerCommand.includes(
-            "physics"
-        ) ||
-
-        lowerCommand.includes(
-            "chemistry"
-        ) ||
-
-        lowerCommand.includes(
-            "math"
-        )
+        lowerCommand.includes("revise") ||
+        lowerCommand.includes("revision") ||
+        lowerCommand.includes("physics") ||
+        lowerCommand.includes("chemistry") ||
+        lowerCommand.includes("math")
     ) {
 
         openStudyHub();
@@ -316,26 +276,13 @@ function sendCommand() {
     }
 
 
-    // =================================================
     // DOCUMENTS
-    // =================================================
 
     if (
-        lowerCommand.includes(
-            "notes"
-        ) ||
-
-        lowerCommand.includes(
-            "document"
-        ) ||
-
-        lowerCommand.includes(
-            "docs"
-        ) ||
-
-        lowerCommand.includes(
-            "find my"
-        )
+        lowerCommand.includes("notes") ||
+        lowerCommand.includes("document") ||
+        lowerCommand.includes("docs") ||
+        lowerCommand.includes("find my")
     ) {
 
         response.innerText =
@@ -350,22 +297,12 @@ function sendCommand() {
     }
 
 
-    // =================================================
     // HOMEWORK
-    // =================================================
 
     if (
-        lowerCommand.includes(
-            "homework"
-        ) ||
-
-        lowerCommand.includes(
-            "assignment"
-        ) ||
-
-        lowerCommand.includes(
-            "assignments"
-        )
+        lowerCommand.includes("homework") ||
+        lowerCommand.includes("assignment") ||
+        lowerCommand.includes("assignments")
     ) {
 
         openHomework();
@@ -377,26 +314,13 @@ function sendCommand() {
     }
 
 
-    // =================================================
-    // TESTS AND EXAMS
-    // =================================================
+    // TESTS
 
     if (
-        lowerCommand.includes(
-            "test"
-        ) ||
-
-        lowerCommand.includes(
-            "tests"
-        ) ||
-
-        lowerCommand.includes(
-            "exam"
-        ) ||
-
-        lowerCommand.includes(
-            "exams"
-        )
+        lowerCommand.includes("test") ||
+        lowerCommand.includes("tests") ||
+        lowerCommand.includes("exam") ||
+        lowerCommand.includes("exams")
     ) {
 
         openTests();
@@ -408,9 +332,7 @@ function sendCommand() {
     }
 
 
-    // =================================================
-    // AI CONVERSATION
-    // =================================================
+    // AI
 
     askJARVIS(command);
 
@@ -443,10 +365,8 @@ async function askJARVIS(message) {
                     method: "POST",
 
                     headers: {
-
                         "Content-Type":
                             "application/json"
-
                     },
 
                     body: JSON.stringify({
@@ -463,17 +383,12 @@ async function askJARVIS(message) {
                     })
 
                 }
-
             );
 
 
         const data =
             await result.json();
 
-
-        // =================================================
-        // CHECK FOR ERROR
-        // =================================================
 
         if (!result.ok) {
 
@@ -484,10 +399,6 @@ async function askJARVIS(message) {
 
         }
 
-
-        // =================================================
-        // SAVE CONVERSATION
-        // =================================================
 
         conversationHistory.push({
 
@@ -509,34 +420,20 @@ async function askJARVIS(message) {
         });
 
 
-        // =================================================
-        // LIMIT CONVERSATION HISTORY
-        // =================================================
-
         if (
             conversationHistory.length > 20
         ) {
 
             conversationHistory =
-                conversationHistory.slice(
-                    -20
-                );
+                conversationHistory.slice(-20);
 
         }
 
-
-        // =================================================
-        // DISPLAY RESPONSE
-        // =================================================
 
         response.innerText =
             "JARVIS: " +
             data.response;
 
-
-        // =================================================
-        // SPEAK RESPONSE
-        // =================================================
 
         speak(
             response.innerText
@@ -554,7 +451,6 @@ async function askJARVIS(message) {
         response.innerText =
             "JARVIS: I'm having trouble connecting to my AI system.";
 
-
         speak(
             response.innerText
         );
@@ -565,7 +461,7 @@ async function askJARVIS(message) {
 
 
 // =====================================================
-// OPEN MEMORY PANEL
+// MEMORY
 // =====================================================
 
 function openMemory() {
@@ -634,7 +530,7 @@ function openStudyHub() {
 
 
     response.innerText =
-        "JARVIS: Study Hub activated. Configure your study session.";
+        "JARVIS: Study Hub activated.";
 
 }
 
@@ -697,15 +593,11 @@ async function generateStudySession() {
         );
 
 
-    const response =
+    const activeSession =
         document.getElementById(
-            "response"
+            "activeStudySession"
         );
 
-
-    // =================================================
-    // CHECK TOPIC
-    // =================================================
 
     if (topic === "") {
 
@@ -726,10 +618,6 @@ async function generateStudySession() {
     }
 
 
-    // =================================================
-    // SHOW LOADING
-    // =================================================
-
     result.innerHTML = `
 
         <div class="response-label">
@@ -737,24 +625,12 @@ async function generateStudySession() {
         </div>
 
         <p>
-            Analysing your study requirements...
-        </p>
-
-        <p>
-            Generating a ${duration}-minute
-            ${subject} study session.
+            Generating your ${duration}-minute
+            ${subject} study session...
         </p>
 
     `;
 
-
-    response.innerText =
-        "JARVIS: Building your personalised study session...";
-
-
-    // =================================================
-    // BUILD AI REQUEST
-    // =================================================
 
     const studyPrompt = `
 
@@ -774,16 +650,14 @@ Create a practical study plan.
 
 Include:
 
-1. A short warm-up or recall activity.
-2. The key concepts the student should focus on.
-3. A main learning or revision activity.
-4. Practice questions or tasks.
-5. A short final recall/check.
-6. A recommended breakdown of the ${duration} minutes.
+1. Warm-up / recall
+2. Key concepts
+3. Main learning or revision activity
+4. Practice questions or tasks
+5. Final recall/check
+6. Time breakdown
 
-Keep it clear, realistic and suitable for a secondary school student.
-
-Do not make the session unnecessarily complicated.
+Keep it realistic and suitable for a secondary school student.
 
 `;
 
@@ -798,10 +672,8 @@ Do not make the session unnecessarily complicated.
                     method: "POST",
 
                     headers: {
-
                         "Content-Type":
                             "application/json"
-
                     },
 
                     body: JSON.stringify({
@@ -818,7 +690,6 @@ Do not make the session unnecessarily complicated.
                     })
 
                 }
-
             );
 
 
@@ -826,47 +697,33 @@ Do not make the session unnecessarily complicated.
             await aiResult.json();
 
 
-        // =================================================
-        // CHECK ERROR
-        // =================================================
-
         if (!aiResult.ok) {
 
             throw new Error(
                 data.error ||
-                "Study session generation failed."
+                "Study generation failed."
             );
 
         }
 
 
-        // =================================================
-        // DISPLAY STUDY SESSION
-        // =================================================
-
         result.innerHTML = `
 
             <div class="response-label">
-                JARVIS STUDY SESSION
+                JARVIS STUDY PLAN
             </div>
 
             <p>
-                <strong>
-                    ${subject}
-                </strong>
+                <strong>${subject}</strong>
             </p>
 
             <p>
-                <strong>
-                    Topic:
-                </strong>
+                <strong>Topic:</strong>
                 ${topic}
             </p>
 
             <p>
-                <strong>
-                    Duration:
-                </strong>
+                <strong>Duration:</strong>
                 ${duration} minutes
             </p>
 
@@ -879,9 +736,20 @@ Do not make the session unnecessarily complicated.
         `;
 
 
-        // =================================================
-        // SAVE TO CONVERSATION
-        // =================================================
+        // Prepare the actual timer session
+
+        prepareStudySession(
+            subject,
+            topic,
+            duration
+        );
+
+
+        activeSession.scrollIntoView({
+            behavior: "smooth",
+            block: "nearest"
+        });
+
 
         conversationHistory.push({
 
@@ -908,15 +776,19 @@ Do not make the session unnecessarily complicated.
         ) {
 
             conversationHistory =
-                conversationHistory.slice(
-                    -20
-                );
+                conversationHistory.slice(-20);
 
         }
 
 
+        const response =
+            document.getElementById(
+                "response"
+            );
+
+
         response.innerText =
-            "JARVIS: Your study session is ready.";
+            "JARVIS: Your study session is ready. Press START when you're ready.";
 
 
         speak(
@@ -939,24 +811,590 @@ Do not make the session unnecessarily complicated.
             </div>
 
             <p>
-                I couldn't generate the study session right now.
+                I couldn't generate your study session.
             </p>
 
             <p>
-                Please check your AI connection and try again.
+                Please try again.
             </p>
 
         `;
 
+    }
 
-        response.innerText =
-            "JARVIS: I couldn't generate your study session.";
+}
 
-        speak(
-            response.innerText
+
+// =====================================================
+// PREPARE STUDY SESSION
+// =====================================================
+
+function prepareStudySession(
+    subject,
+    topic,
+    duration
+) {
+
+    const activeSession =
+        document.getElementById(
+            "activeStudySession"
         );
 
+
+    const sessionSubject =
+        document.getElementById(
+            "sessionSubject"
+        );
+
+
+    const sessionTopic =
+        document.getElementById(
+            "sessionTopic"
+        );
+
+
+    const currentTask =
+        document.getElementById(
+            "currentTask"
+        );
+
+
+    const sessionStatus =
+        document.getElementById(
+            "sessionStatus"
+        );
+
+
+    const durationNumber =
+        parseInt(
+            duration
+        );
+
+
+    studyTotalSeconds =
+        durationNumber * 60;
+
+
+    studyRemainingSeconds =
+        studyTotalSeconds;
+
+
+    studyRunning =
+        false;
+
+
+    currentTaskIndex =
+        0;
+
+
+    studyStartTime =
+        null;
+
+
+    studyTasks = [
+
+        "Warm up by recalling what you already know.",
+
+        `Review the key concepts of ${topic}.`,
+
+        `Work through examples related to ${topic}.`,
+
+        `Complete practice questions on ${topic}.`,
+
+        "Check your answers and identify weak areas.",
+
+        "Do a final recall without looking at your notes."
+
+    ];
+
+
+    sessionSubject.innerText =
+        subject;
+
+
+    sessionTopic.innerText =
+        topic;
+
+
+    currentTask.innerText =
+        studyTasks[0];
+
+
+    sessionStatus.innerText =
+        "READY";
+
+
+    updateTimerDisplay();
+
+
+    updateProgress();
+
+
+    activeSession.classList.add(
+        "session-visible"
+    );
+
+}
+
+
+// =====================================================
+// START TIMER
+// =====================================================
+
+function startTimer() {
+
+    if (
+        studyTotalSeconds <= 0
+    ) {
+
+        return;
+
     }
+
+
+    if (studyRunning) {
+
+        return;
+
+    }
+
+
+    studyRunning =
+        true;
+
+
+    studyStartTime =
+        new Date();
+
+
+    const sessionStatus =
+        document.getElementById(
+            "sessionStatus"
+        );
+
+
+    sessionStatus.innerText =
+        "RUNNING";
+
+
+    speak(
+        "Study session started."
+    );
+
+
+    studyTimer =
+        setInterval(
+            function() {
+
+                studyRemainingSeconds--;
+
+                updateTimerDisplay();
+
+                updateProgress();
+
+                updateCurrentTask();
+
+
+                if (
+                    studyRemainingSeconds <= 0
+                ) {
+
+                    completeStudySession();
+
+                }
+
+            },
+            1000
+        );
+
+}
+
+
+// =====================================================
+// PAUSE TIMER
+// =====================================================
+
+function pauseTimer() {
+
+    if (!studyRunning) {
+
+        return;
+
+    }
+
+
+    clearInterval(
+        studyTimer
+    );
+
+
+    studyRunning =
+        false;
+
+
+    const sessionStatus =
+        document.getElementById(
+            "sessionStatus"
+        );
+
+
+    sessionStatus.innerText =
+        "PAUSED";
+
+
+    speak(
+        "Study session paused."
+    );
+
+}
+
+
+// =====================================================
+// RESET TIMER
+// =====================================================
+
+function resetTimer() {
+
+    clearInterval(
+        studyTimer
+    );
+
+
+    studyRunning =
+        false;
+
+
+    studyRemainingSeconds =
+        studyTotalSeconds;
+
+
+    currentTaskIndex =
+        0;
+
+
+    const sessionStatus =
+        document.getElementById(
+            "sessionStatus"
+        );
+
+
+    sessionStatus.innerText =
+        "READY";
+
+
+    updateTimerDisplay();
+
+    updateProgress();
+
+    updateCurrentTask();
+
+
+    speak(
+        "Study session reset."
+    );
+
+}
+
+
+// =====================================================
+// UPDATE TIMER DISPLAY
+// =====================================================
+
+function updateTimerDisplay() {
+
+    const timerDisplay =
+        document.getElementById(
+            "timerDisplay"
+        );
+
+
+    if (!timerDisplay) {
+        return;
+    }
+
+
+    const minutes =
+        Math.floor(
+            studyRemainingSeconds / 60
+        );
+
+
+    const seconds =
+        studyRemainingSeconds % 60;
+
+
+    timerDisplay.innerText =
+        String(minutes).padStart(2, "0") +
+        ":" +
+        String(seconds).padStart(2, "0");
+
+}
+
+
+// =====================================================
+// UPDATE PROGRESS
+// =====================================================
+
+function updateProgress() {
+
+    if (
+        studyTotalSeconds <= 0
+    ) {
+
+        return;
+
+    }
+
+
+    const elapsed =
+        studyTotalSeconds -
+        studyRemainingSeconds;
+
+
+    const percentage =
+        Math.min(
+            100,
+            Math.round(
+                (elapsed /
+                    studyTotalSeconds) *
+                100
+            )
+        );
+
+
+    const progressFill =
+        document.getElementById(
+            "progressFill"
+        );
+
+
+    const progressPercent =
+        document.getElementById(
+            "progressPercent"
+        );
+
+
+    if (progressFill) {
+
+        progressFill.style.width =
+            percentage + "%";
+
+    }
+
+
+    if (progressPercent) {
+
+        progressPercent.innerText =
+            percentage + "%";
+
+    }
+
+}
+
+
+// =====================================================
+// UPDATE CURRENT TASK
+// =====================================================
+
+function updateCurrentTask() {
+
+    if (
+        !studyRunning ||
+        studyTasks.length === 0
+    ) {
+
+        return;
+
+    }
+
+
+    const elapsed =
+        studyTotalSeconds -
+        studyRemainingSeconds;
+
+
+    const progress =
+        elapsed /
+        studyTotalSeconds;
+
+
+    let newIndex;
+
+
+    if (progress < 0.15) {
+
+        newIndex = 0;
+
+    } else if (progress < 0.30) {
+
+        newIndex = 1;
+
+    } else if (progress < 0.55) {
+
+        newIndex = 2;
+
+    } else if (progress < 0.75) {
+
+        newIndex = 3;
+
+    } else if (progress < 0.90) {
+
+        newIndex = 4;
+
+    } else {
+
+        newIndex = 5;
+
+    }
+
+
+    if (
+        newIndex !== currentTaskIndex
+    ) {
+
+        currentTaskIndex =
+            newIndex;
+
+
+        const currentTask =
+            document.getElementById(
+                "currentTask"
+            );
+
+
+        if (currentTask) {
+
+            currentTask.innerText =
+                studyTasks[
+                    currentTaskIndex
+                ];
+
+        }
+
+    }
+
+}
+
+
+// =====================================================
+// FINISH STUDY SESSION
+// =====================================================
+
+function finishStudySession() {
+
+    if (
+        studyTotalSeconds <= 0
+    ) {
+
+        return;
+
+    }
+
+
+    clearInterval(
+        studyTimer
+    );
+
+
+    studyRunning =
+        false;
+
+
+    const sessionStatus =
+        document.getElementById(
+            "sessionStatus"
+        );
+
+
+    sessionStatus.innerText =
+        "COMPLETED";
+
+
+    const currentTask =
+        document.getElementById(
+            "currentTask"
+        );
+
+
+    currentTask.innerText =
+        "Session completed. Excellent work.";
+
+
+    const response =
+        document.getElementById(
+            "response"
+        );
+
+
+    response.innerText =
+        "JARVIS: Study session completed. Well done.";
+
+
+    speak(
+        "Study session completed. Well done."
+    );
+
+
+}
+
+
+// =====================================================
+// AUTOMATIC COMPLETION
+// =====================================================
+
+function completeStudySession() {
+
+    clearInterval(
+        studyTimer
+    );
+
+
+    studyRunning =
+        false;
+
+
+    studyRemainingSeconds =
+        0;
+
+
+    updateTimerDisplay();
+
+    updateProgress();
+
+
+    const sessionStatus =
+        document.getElementById(
+            "sessionStatus"
+        );
+
+
+    const currentTask =
+        document.getElementById(
+            "currentTask"
+        );
+
+
+    sessionStatus.innerText =
+        "COMPLETED";
+
+
+    currentTask.innerText =
+        "Time is up. Session completed.";
+
+
+    const response =
+        document.getElementById(
+            "response"
+        );
+
+
+    response.innerText =
+        "JARVIS: Your study session is complete. Great work.";
+
+
+    speak(
+        "Your study session is complete. Great work."
+    );
 
 }
 
@@ -978,7 +1416,6 @@ function formatStudyResponse(text) {
         text;
 
 
-    // Escape HTML
     formatted =
         formatted
             .replace(
@@ -995,7 +1432,6 @@ function formatStudyResponse(text) {
             );
 
 
-    // Bold markdown
     formatted =
         formatted.replace(
             /\*\*(.*?)\*\*/g,
@@ -1003,7 +1439,6 @@ function formatStudyResponse(text) {
         );
 
 
-    // Headings
     formatted =
         formatted.replace(
             /^### (.*)$/gm,
@@ -1018,7 +1453,6 @@ function formatStudyResponse(text) {
         );
 
 
-    // Numbered lists
     formatted =
         formatted.replace(
             /^(\d+)\. (.*)$/gm,
@@ -1026,7 +1460,6 @@ function formatStudyResponse(text) {
         );
 
 
-    // Bullet points
     formatted =
         formatted.replace(
             /^[-•] (.*)$/gm,
@@ -1034,7 +1467,6 @@ function formatStudyResponse(text) {
         );
 
 
-    // Line breaks
     formatted =
         formatted.replace(
             /\n/g,
@@ -1054,7 +1486,9 @@ function formatStudyResponse(text) {
 function openSchedule() {
 
     const response =
-        document.getElementById("response");
+        document.getElementById(
+            "response"
+        );
 
 
     response.innerText =
@@ -1075,7 +1509,9 @@ function openSchedule() {
 function openHomework() {
 
     const response =
-        document.getElementById("response");
+        document.getElementById(
+            "response"
+        );
 
 
     response.innerText =
@@ -1096,7 +1532,9 @@ function openHomework() {
 function openTests() {
 
     const response =
-        document.getElementById("response");
+        document.getElementById(
+            "response"
+        );
 
 
     response.innerText =
@@ -1111,7 +1549,7 @@ function openTests() {
 
 
 // =====================================================
-// LEGACY STUDY BUTTON
+// LEGACY STUDY FUNCTION
 // =====================================================
 
 function startStudy() {
@@ -1128,16 +1566,16 @@ function startStudy() {
 function startListening() {
 
     const response =
-        document.getElementById("response");
+        document.getElementById(
+            "response"
+        );
 
 
     const input =
-        document.getElementById("commandInput");
+        document.getElementById(
+            "commandInput"
+        );
 
-
-    // =================================================
-    // CHECK BROWSER SUPPORT
-    // =================================================
 
     if (
         !("webkitSpeechRecognition" in window)
@@ -1178,10 +1616,6 @@ function startListening() {
     recognition.start();
 
 
-    // =================================================
-    // VOICE RESULT
-    // =================================================
-
     recognition.onresult =
         function(event) {
 
@@ -1195,18 +1629,10 @@ function startListening() {
                 transcript;
 
 
-            response.innerText =
-                "JARVIS: Command received. Processing...";
-
-
             sendCommand();
 
         };
 
-
-    // =================================================
-    // VOICE ERROR
-    // =================================================
 
     recognition.onerror =
         function() {
@@ -1221,10 +1647,6 @@ function startListening() {
         };
 
 
-    // =================================================
-    // VOICE END
-    // =================================================
-
     recognition.onend =
         function() {
 
@@ -1238,7 +1660,7 @@ function startListening() {
 
 
 // =====================================================
-// ENTER KEY SUPPORT
+// ENTER KEY
 // =====================================================
 
 document.addEventListener(
@@ -1270,9 +1692,6 @@ document.addEventListener(
 
         }
 
-
-        // Close Study Hub when clicking
-        // outside the main box
 
         const studyHub =
             document.getElementById(
