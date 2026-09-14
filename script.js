@@ -1,13 +1,36 @@
+// =========================
+// JARVIS CONVERSATION MEMORY
+// =========================
+
+let conversationHistory = [];
+
+
+// =========================
+// SEND COMMAND
+// =========================
+
 function sendCommand() {
 
-    const input = document.getElementById("commandInput");
-    const command = input.value.trim().toLowerCase();
+    const input =
+        document.getElementById("commandInput");
 
-    const response = document.getElementById("response");
+    const command =
+        input.value.trim();
+
+    const lowerCommand =
+        command.toLowerCase();
+
+    const response =
+        document.getElementById("response");
+
 
     if (command === "") {
-        response.innerText = "JARVIS: Please give me a command.";
+
+        response.innerText =
+            "JARVIS: Please give me a command.";
+
         speak(response.innerText);
+
         return;
     }
 
@@ -17,10 +40,10 @@ function sendCommand() {
     // =========================
 
     if (
-        command.includes("schedule") ||
-        command.includes("calendar") ||
-        command.includes("what do i have today") ||
-        command.includes("what's on today")
+        lowerCommand.includes("schedule") ||
+        lowerCommand.includes("calendar") ||
+        lowerCommand.includes("what do i have today") ||
+        lowerCommand.includes("what's on today")
     ) {
 
         response.innerText =
@@ -29,6 +52,7 @@ function sendCommand() {
         speak(response.innerText);
 
         input.value = "";
+
         return;
     }
 
@@ -38,12 +62,12 @@ function sendCommand() {
     // =========================
 
     if (
-        command.includes("study") ||
-        command.includes("revise") ||
-        command.includes("revision") ||
-        command.includes("physics") ||
-        command.includes("chemistry") ||
-        command.includes("math")
+        lowerCommand.includes("study") ||
+        lowerCommand.includes("revise") ||
+        lowerCommand.includes("revision") ||
+        lowerCommand.includes("physics") ||
+        lowerCommand.includes("chemistry") ||
+        lowerCommand.includes("math")
     ) {
 
         response.innerText =
@@ -52,6 +76,7 @@ function sendCommand() {
         speak(response.innerText);
 
         input.value = "";
+
         return;
     }
 
@@ -61,10 +86,10 @@ function sendCommand() {
     // =========================
 
     if (
-        command.includes("notes") ||
-        command.includes("document") ||
-        command.includes("docs") ||
-        command.includes("find my")
+        lowerCommand.includes("notes") ||
+        lowerCommand.includes("document") ||
+        lowerCommand.includes("docs") ||
+        lowerCommand.includes("find my")
     ) {
 
         response.innerText =
@@ -73,6 +98,7 @@ function sendCommand() {
         speak(response.innerText);
 
         input.value = "";
+
         return;
     }
 
@@ -82,9 +108,9 @@ function sendCommand() {
     // =========================
 
     if (
-        command.includes("homework") ||
-        command.includes("assignment") ||
-        command.includes("assignments")
+        lowerCommand.includes("homework") ||
+        lowerCommand.includes("assignment") ||
+        lowerCommand.includes("assignments")
     ) {
 
         response.innerText =
@@ -93,6 +119,7 @@ function sendCommand() {
         speak(response.innerText);
 
         input.value = "";
+
         return;
     }
 
@@ -102,10 +129,10 @@ function sendCommand() {
     // =========================
 
     if (
-        command.includes("test") ||
-        command.includes("tests") ||
-        command.includes("exam") ||
-        command.includes("exams")
+        lowerCommand.includes("test") ||
+        lowerCommand.includes("tests") ||
+        lowerCommand.includes("exam") ||
+        lowerCommand.includes("exams")
     ) {
 
         response.innerText =
@@ -114,12 +141,13 @@ function sendCommand() {
         speak(response.innerText);
 
         input.value = "";
+
         return;
     }
 
 
     // =========================
-    // AI COMMAND
+    // AI CONVERSATION
     // =========================
 
     askJARVIS(command);
@@ -129,17 +157,17 @@ function sendCommand() {
 
 
 // =========================
-// CONNECT TO JARVIS AI
+// ASK JARVIS AI
 // =========================
 
 async function askJARVIS(message) {
 
-    const response = document.getElementById("response");
+    const response =
+        document.getElementById("response");
+
 
     response.innerText =
         "JARVIS: Thinking...";
-
-    speak(response.innerText);
 
 
     try {
@@ -154,13 +182,15 @@ async function askJARVIS(message) {
                 },
 
                 body: JSON.stringify({
-                    message: message
+                    message: message,
+                    history: conversationHistory
                 })
             }
         );
 
 
-        const data = await result.json();
+        const data =
+            await result.json();
 
 
         if (!result.ok) {
@@ -168,9 +198,28 @@ async function askJARVIS(message) {
             throw new Error(
                 data.error || "Request failed"
             );
-
         }
 
+
+        // =========================
+        // SAVE CONVERSATION
+        // =========================
+
+        conversationHistory.push({
+            role: "user",
+            content: message
+        });
+
+
+        conversationHistory.push({
+            role: "assistant",
+            content: data.response
+        });
+
+
+        // =========================
+        // DISPLAY RESPONSE
+        // =========================
 
         response.innerText =
             "JARVIS: " + data.response;
@@ -194,7 +243,6 @@ async function askJARVIS(message) {
         speak(response.innerText);
 
     }
-
 }
 
 
@@ -239,8 +287,6 @@ function startListening() {
     response.innerText =
         "JARVIS: Listening...";
 
-    speak(response.innerText);
-
 
     recognition.start();
 
@@ -261,7 +307,6 @@ function startListening() {
 
 
             sendCommand();
-
         };
 
 
