@@ -1,1774 +1,1103 @@
-/* =====================================================
-   JARVIS - FUTURISTIC STUDENT ASSISTANT
-   COMPLETE STYLE SHEET
-   ===================================================== */
+<!DOCTYPE html>
+<html lang="en">
 
+<head>
 
-/* =====================================================
-   GLOBAL
-   ===================================================== */
+    <meta charset="UTF-8">
 
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
+    <title>J.A.R.V.I.S. — Student Assistant</title>
 
-html {
-    scroll-behavior: smooth;
-}
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
 
+</head>
 
-body {
 
-    min-height: 100vh;
+<body>
 
-    background:
-        radial-gradient(
-            circle at center,
-            #10263d 0%,
-            #07121f 40%,
-            #02070d 100%
-        );
+    <div class="background-grid"></div>
 
-    color: #dff7ff;
+    <div class="scan-line"></div>
 
-    font-family:
-        Arial,
-        Helvetica,
-        sans-serif;
 
-    overflow-x: hidden;
+    <!-- =================================================
+         HEADER
+         ================================================= -->
 
-}
+    <header>
 
+        <div class="logo">
 
-/* =====================================================
-   BACKGROUND GRID
-   ===================================================== */
+            J.A.R.V.I.S.
 
-.background-grid {
+            <span class="subtitle">
+                PERSONAL AI SYSTEM
+            </span>
 
-    position: fixed;
+        </div>
 
-    inset: 0;
 
-    z-index: -3;
+        <div class="system-status">
 
-    opacity: 0.18;
+            <span class="status-dot">
+                ●
+            </span>
 
-    background-image:
+            SYSTEM ONLINE
 
-        linear-gradient(
-            rgba(0, 200, 255, 0.12) 1px,
-            transparent 1px
-        ),
+        </div>
 
-        linear-gradient(
-            90deg,
-            rgba(0, 200, 255, 0.12) 1px,
-            transparent 1px
-        );
+    </header>
 
-    background-size: 45px 45px;
 
-    animation:
-        gridMove 20s linear infinite;
 
-}
+    <!-- =================================================
+         MAIN
+         ================================================= -->
 
+    <main>
 
-@keyframes gridMove {
 
-    from {
-        background-position:
-            0 0;
-    }
+        <!-- =================================================
+             CENTRAL JARVIS PANEL
+             ================================================= -->
 
-    to {
-        background-position:
-            45px 45px;
-    }
+        <section class="main-panel">
 
-}
+            <div class="small-text">
 
+                JUST A RATHER VERY INTELLIGENT SYSTEM
 
-/* =====================================================
-   SCAN LINE
-   ===================================================== */
+            </div>
 
-.scan-line {
 
-    position: fixed;
+            <!-- JARVIS CORE -->
 
-    left: 0;
+            <div class="core">
 
-    top: -10%;
+                <div class="core-ring ring-one"></div>
 
-    width: 100%;
+                <div class="core-ring ring-two"></div>
 
-    height: 2px;
+                <div class="core-ring ring-three"></div>
 
-    background:
-        linear-gradient(
-            90deg,
-            transparent,
-            #00d9ff,
-            transparent
-        );
+                <div class="core-ring ring-four"></div>
 
-    box-shadow:
-        0 0 20px #00d9ff;
 
-    opacity: 0.45;
+                <div class="core-center">
 
-    z-index: 20;
+                    <span>
+                        J
+                    </span>
 
-    pointer-events: none;
+                </div>
 
-    animation:
-        scan 7s linear infinite;
+            </div>
 
-}
 
+            <div class="ready">
 
-@keyframes scan {
+                <span class="status-indicator">
+                    ●
+                </span>
 
-    from {
-        top: -10%;
-    }
+                READY FOR COMMAND
 
-    to {
-        top: 110%;
-    }
+            </div>
 
-}
 
 
-/* =====================================================
-   HEADER
-   ===================================================== */
+            <!-- =================================================
+                 COMMAND AREA
+                 Voice button removed.
+                 Automatic voice will be handled by script.js.
+                 ================================================= -->
 
-header {
+            <div class="command-area">
 
-    width: 100%;
+                <input
+                    id="commandInput"
+                    type="text"
+                    placeholder="Ask JARVIS anything..."
+                    autocomplete="off"
+                >
 
-    display: flex;
 
-    justify-content: space-between;
+                <button
+                    onclick="sendCommand()"
+                    class="send-button"
+                >
 
-    align-items: center;
+                    SEND
 
-    padding: 25px 45px;
+                </button>
 
-    border-bottom:
-        1px solid
-        rgba(0, 210, 255, 0.25);
+            </div>
 
-    background:
-        rgba(2, 10, 18, 0.72);
 
-    backdrop-filter:
-        blur(12px);
 
-}
+            <!-- =================================================
+                 AI RESPONSE
+                 ================================================= -->
 
+            <div
+                id="response"
+                class="response-box"
+            >
 
-.logo {
+                <span class="response-label">
+                    JARVIS
+                </span>
 
-    font-size: 28px;
+                <span class="response-text">
+                    Initialising JARVIS...
+                </span>
 
-    font-weight: 700;
+            </div>
 
-    letter-spacing: 6px;
+        </section>
 
-    color: #e8fbff;
 
-    text-shadow:
-        0 0 8px rgba(0, 210, 255, 0.7),
-        0 0 20px rgba(0, 210, 255, 0.35);
 
-}
+        <!-- =================================================
+             DASHBOARD
+             ================================================= -->
 
+        <section class="dashboard">
 
-.subtitle {
 
-    display: block;
+            <!-- =================================================
+                 SYSTEM
+                 ================================================= -->
 
-    margin-top: 5px;
+            <div class="panel system-panel">
 
-    font-size: 9px;
+                <div class="panel-header">
 
-    letter-spacing: 3px;
+                    <span class="panel-icon">
+                        ◉
+                    </span>
 
-    color: #5fcce8;
+                    <h2>
+                        SYSTEM
+                    </h2>
 
-}
+                </div>
 
 
-.system-status {
+                <div class="system-data">
 
-    font-size: 12px;
+                    <div>
 
-    letter-spacing: 2px;
+                        <span>
+                            AI CORE
+                        </span>
 
-    color: #8edff1;
+                        <strong>
+                            ONLINE
+                        </strong>
 
-}
+                    </div>
 
 
-.status-dot {
+                    <div>
 
-    color: #00ffb3;
+                        <span>
+                            MEMORY
+                        </span>
 
-    text-shadow:
-        0 0 10px #00ffb3;
+                        <strong>
+                            ACTIVE
+                        </strong>
 
-}
+                    </div>
 
 
-/* =====================================================
-   MAIN
-   ===================================================== */
+                    <div>
 
-main {
+                        <span>
+                            VOICE
+                        </span>
 
-    width: min(
-        1250px,
-        94%
-    );
+                        <strong>
+                            AUTO
+                        </strong>
 
-    margin: 40px auto;
+                    </div>
 
-}
+                </div>
 
+            </div>
 
-/* =====================================================
-   CENTRAL PANEL
-   ===================================================== */
 
-.main-panel {
 
-    min-height: 560px;
+            <!-- =================================================
+                 SCHEDULE
+                 ================================================= -->
 
-    display: flex;
+            <div class="panel">
 
-    flex-direction: column;
+                <div class="panel-header">
 
-    justify-content: center;
+                    <span class="panel-icon">
+                        ◷
+                    </span>
 
-    align-items: center;
+                    <h2>
+                        SCHEDULE
+                    </h2>
 
-    padding: 45px;
+                </div>
 
-    border:
-        1px solid
-        rgba(0, 220, 255, 0.35);
 
-    background:
-        radial-gradient(
-            circle at center,
-            rgba(0, 150, 210, 0.08),
-            rgba(2, 12, 22, 0.75)
-        );
+                <p>
+                    No schedule loaded.
+                </p>
 
-    box-shadow:
-        inset 0 0 50px
-        rgba(0, 200, 255, 0.04),
 
-        0 0 35px
-        rgba(0, 180, 255, 0.05);
+                <button
+                    onclick="openSchedule()"
+                >
 
-}
+                    OPEN CALENDAR
 
+                </button>
 
-/* =====================================================
-   SMALL TEXT
-   ===================================================== */
+            </div>
 
-.small-text {
 
-    font-size: 10px;
 
-    letter-spacing: 4px;
+            <!-- =================================================
+                 STUDY HUB
+                 ================================================= -->
 
-    color: #5fcce8;
+            <div class="panel study-panel">
 
-    text-align: center;
+                <div class="panel-header">
 
-}
+                    <span class="panel-icon">
+                        ▣
+                    </span>
 
+                    <h2>
+                        STUDY HUB
+                    </h2>
 
-/* =====================================================
-   JARVIS CORE
-   ===================================================== */
+                </div>
 
-.core {
 
-    position: relative;
+                <p>
+                    Generate and run a personalised study session.
+                </p>
 
-    width: 280px;
 
-    height: 280px;
+                <button
+                    onclick="openStudyHub()"
+                >
 
-    margin: 25px 0;
+                    OPEN STUDY HUB
 
-    display: flex;
+                </button>
 
-    justify-content: center;
+            </div>
 
-    align-items: center;
 
-}
 
+            <!-- =================================================
+                 HOMEWORK
+                 ================================================= -->
 
-.core-center {
+            <div class="panel homework-panel">
 
-    width: 95px;
+                <div class="panel-header">
 
-    height: 95px;
+                    <span class="panel-icon">
+                        ✓
+                    </span>
 
-    border-radius: 50%;
+                    <h2>
+                        HOMEWORK
+                    </h2>
 
-    display: flex;
+                </div>
 
-    justify-content: center;
 
-    align-items: center;
+                <div
+                    id="homeworkSummary"
+                    class="homework-summary"
+                >
 
-    background:
-        radial-gradient(
-            circle,
-            #0c6d91,
-            #05283b
-        );
+                    <strong id="homeworkCount">
+                        0
+                    </strong>
 
-    border:
-        2px solid
-        #00d9ff;
+                    <span>
+                        TASKS
+                    </span>
 
-    box-shadow:
+                </div>
 
-        0 0 15px
-        #00d9ff,
 
-        0 0 40px
-        rgba(0, 217, 255, 0.7),
+                <p id="homeworkStatus">
 
-        inset 0 0 25px
-        rgba(0, 217, 255, 0.4);
+                    No homework added yet.
 
-    z-index: 5;
+                </p>
 
-}
 
+                <button
+                    onclick="openHomework()"
+                >
 
-.core-center span {
+                    OPEN HOMEWORK MANAGER
 
-    font-size: 48px;
+                </button>
 
-    font-weight: bold;
+            </div>
 
-    color: #e9fdff;
 
-    text-shadow:
-        0 0 15px #00d9ff;
 
-}
+            <!-- =================================================
+                 TESTS & EXAMS
+                 ================================================= -->
 
+            <div class="panel">
 
-.core-ring {
+                <div class="panel-header">
 
-    position: absolute;
+                    <span class="panel-icon">
+                        !
+                    </span>
 
-    border-radius: 50%;
+                    <h2>
+                        TESTS & EXAMS
+                    </h2>
 
-    border:
-        1px solid
-        rgba(0, 220, 255, 0.6);
+                </div>
 
-}
 
+                <p>
+                    No tests loaded.
+                </p>
 
-.ring-one {
 
-    width: 135px;
-    height: 135px;
+                <button
+                    onclick="openTests()"
+                >
 
-    border-top-color: transparent;
-    border-bottom-color: transparent;
+                    VIEW TESTS
 
-    animation:
-        spin 5s linear infinite;
+                </button>
 
-}
+            </div>
 
 
-.ring-two {
 
-    width: 180px;
-    height: 180px;
+            <!-- =================================================
+                 MEMORY
+                 ================================================= -->
 
-    border-left-color: transparent;
-    border-right-color: transparent;
+            <div class="panel memory-panel">
 
-    animation:
-        spinReverse 7s linear infinite;
+                <div class="panel-header">
 
-}
+                    <span class="panel-icon">
+                        🧠
+                    </span>
 
+                    <h2>
+                        JARVIS MEMORY
+                    </h2>
 
-.ring-three {
+                </div>
 
-    width: 225px;
-    height: 225px;
 
-    border-top-color: transparent;
+                <p>
+                    Saved preferences and information.
+                </p>
 
-    opacity: 0.65;
 
-    animation:
-        spin 10s linear infinite;
+                <button
+                    onclick="openMemory()"
+                >
 
-}
+                    VIEW MEMORY
 
+                </button>
 
-.ring-four {
+            </div>
 
-    width: 270px;
-    height: 270px;
+        </section>
 
-    border-bottom-color: transparent;
 
-    opacity: 0.45;
 
-    animation:
-        spinReverse 14s linear infinite;
+        <!-- =================================================
+             STUDY HUB
+             ================================================= -->
 
-}
+        <section
+            id="studyHub"
+            class="study-hub"
+        >
 
+            <div class="study-hub-box">
 
-@keyframes spin {
 
-    from {
-        transform: rotate(0deg);
-    }
+                <!-- STUDY HEADER -->
 
-    to {
-        transform: rotate(360deg);
-    }
+                <div class="study-hub-header">
 
-}
+                    <div>
 
+                        <div class="small-text">
+                            J.A.R.V.I.S.
+                        </div>
 
-@keyframes spinReverse {
+                        <h2>
+                            STUDY HUB
+                        </h2>
 
-    from {
-        transform: rotate(360deg);
-    }
+                    </div>
 
-    to {
-        transform: rotate(0deg);
-    }
 
-}
+                    <button
+                        onclick="closeStudyHub()"
+                        class="close-button"
+                    >
 
+                        ×
 
-/* =====================================================
-   READY STATUS
-   ===================================================== */
+                    </button>
 
-.ready {
+                </div>
 
-    margin-bottom: 22px;
 
-    font-size: 12px;
 
-    letter-spacing: 3px;
+                <p class="study-description">
 
-    color: #9defff;
+                    Configure your study session and let JARVIS
+                    build a personalised revision plan.
 
-}
+                </p>
 
 
-.status-indicator {
 
-    color: #00ffb3;
+                <!-- SUBJECT -->
 
-    text-shadow:
-        0 0 10px #00ffb3;
+                <div class="study-field">
 
-}
+                    <label for="studySubject">
+                        SUBJECT
+                    </label>
 
 
-/* =====================================================
-   COMMAND AREA
-   ===================================================== */
+                    <select id="studySubject">
 
-.command-area {
+                        <option value="Physics">
+                            Physics
+                        </option>
 
-    width: min(
-        700px,
-        100%
-    );
+                        <option value="Chemistry">
+                            Chemistry
+                        </option>
 
-    display: flex;
+                        <option value="Mathematics">
+                            Mathematics
+                        </option>
 
-    gap: 8px;
+                        <option value="Social Studies">
+                            Social Studies
+                        </option>
 
-}
+                        <option value="English">
+                            English
+                        </option>
 
+                        <option value="Tamil">
+                            Tamil
+                        </option>
 
-.command-area input {
+                        <option value="Other">
+                            Other
+                        </option>
 
-    flex: 1;
+                    </select>
 
-    min-width: 0;
+                </div>
 
-    padding: 16px 18px;
 
-    background:
-        rgba(1, 12, 22, 0.9);
 
-    border:
-        1px solid
-        rgba(0, 210, 255, 0.4);
+                <!-- TOPIC -->
 
-    color: #eaffff;
+                <div class="study-field">
 
-    outline: none;
+                    <label for="studyTopic">
+                        TOPIC
+                    </label>
 
-    font-size: 14px;
 
-    transition:
-        0.25s;
+                    <input
+                        id="studyTopic"
+                        type="text"
+                        placeholder="e.g. Turning Effects of Forces"
+                    >
 
-}
+                </div>
 
 
-.command-area input:focus {
 
-    border-color:
-        #00d9ff;
+                <!-- DURATION -->
 
-    box-shadow:
-        0 0 15px
-        rgba(0, 217, 255, 0.2);
+                <div class="study-field">
 
-}
+                    <label for="studyDuration">
+                        STUDY DURATION
+                    </label>
 
 
-.command-area input::placeholder {
+                    <select id="studyDuration">
 
-    color: #568291;
+                        <option value="25">
+                            25 minutes
+                        </option>
 
-}
+                        <option value="45">
+                            45 minutes
+                        </option>
 
+                        <option value="60">
+                            1 hour
+                        </option>
 
-button {
+                        <option value="90">
+                            1.5 hours
+                        </option>
 
-    border:
-        1px solid
-        rgba(0, 215, 255, 0.55);
+                        <option value="120">
+                            2 hours
+                        </option>
 
-    background:
-        rgba(0, 100, 140, 0.18);
+                    </select>
 
-    color: #bff6ff;
+                </div>
 
-    padding:
-        11px 16px;
 
-    cursor: pointer;
 
-    font-size: 11px;
+                <!-- GOAL -->
 
-    letter-spacing: 1.5px;
+                <div class="study-field">
 
-    transition:
-        0.25s;
+                    <label for="studyGoal">
+                        STUDY GOAL
+                    </label>
 
-}
 
+                    <select id="studyGoal">
 
-button:hover {
+                        <option value="Learn the topic">
+                            Learn the topic
+                        </option>
 
-    background:
-        rgba(0, 190, 240, 0.2);
+                        <option value="Revise">
+                            Revise
+                        </option>
 
-    border-color:
-        #00d9ff;
+                        <option value="Prepare for a test">
+                            Prepare for a test
+                        </option>
 
-    box-shadow:
-        0 0 15px
-        rgba(0, 210, 255, 0.25);
+                        <option value="Practise questions">
+                            Practise questions
+                        </option>
 
-    transform:
-        translateY(-1px);
+                        <option value="Memorise key concepts">
+                            Memorise key concepts
+                        </option>
 
-}
+                    </select>
 
+                </div>
 
-.send-button {
 
-    background:
-        rgba(0, 150, 200, 0.22);
 
-}
+                <!-- GENERATE -->
 
+                <button
+                    onclick="generateStudySession()"
+                    class="study-start-button"
+                >
 
-.voice-button {
+                    GENERATE STUDY SESSION
 
-    width: 55px;
+                </button>
 
-    font-size: 17px;
 
-}
 
+                <!-- STUDY RESULT -->
 
-/* =====================================================
-   RESPONSE
-   ===================================================== */
+                <div
+                    id="studyResult"
+                    class="study-result"
+                >
 
-.response-box {
+                    <div class="response-label">
+                        JARVIS STUDY SYSTEM
+                    </div>
 
-    width: min(
-        700px,
-        100%
-    );
+                    <p>
+                        Configure your session above.
+                    </p>
 
-    min-height: 85px;
+                </div>
 
-    margin-top: 18px;
 
-    padding: 18px;
 
-    border:
-        1px solid
-        rgba(0, 190, 230, 0.25);
+                <!-- =================================================
+                     ACTIVE STUDY SESSION
+                     ================================================= -->
 
-    background:
-        rgba(0, 12, 22, 0.65);
+                <div
+                    id="activeStudySession"
+                    class="active-study-session"
+                >
 
-    color: #bcecf7;
 
-    font-size: 13px;
+                    <div class="session-header">
 
-    line-height: 1.6;
+                        <div>
 
-    white-space: pre-wrap;
+                            <div class="response-label">
+                                ACTIVE STUDY SESSION
+                            </div>
 
-}
+                            <h3 id="sessionSubject">
+                                —
+                            </h3>
 
+                            <p id="sessionTopic">
+                                —
+                            </p>
 
-.response-label {
+                        </div>
 
-    display: block;
 
-    margin-bottom: 7px;
+                        <div
+                            id="sessionStatus"
+                            class="session-status"
+                        >
 
-    color: #00d9ff;
+                            READY
 
-    font-size: 10px;
+                        </div>
 
-    letter-spacing: 2px;
+                    </div>
 
-}
 
 
-/* =====================================================
-   DASHBOARD
-   ===================================================== */
+                    <!-- TIMER -->
 
-.dashboard {
+                    <div class="study-timer">
 
-    margin-top: 30px;
+                        <div
+                            id="timerDisplay"
+                            class="timer-display"
+                        >
 
-    display: grid;
+                            00:00
 
-    grid-template-columns:
-        repeat(
-            3,
-            1fr
-        );
+                        </div>
 
-    gap: 16px;
 
-}
+                        <div class="timer-label">
 
+                            REMAINING
 
-.panel {
+                        </div>
 
-    min-height: 190px;
+                    </div>
 
-    padding: 22px;
 
-    border:
-        1px solid
-        rgba(0, 210, 255, 0.25);
 
-    background:
-        rgba(3, 15, 26, 0.78);
+                    <!-- PROGRESS -->
 
-    transition:
-        0.3s;
+                    <div class="progress-section">
 
-}
+                        <div class="progress-info">
 
+                            <span>
+                                SESSION PROGRESS
+                            </span>
 
-.panel:hover {
+                            <span
+                                id="progressPercent"
+                            >
+                                0%
+                            </span>
 
-    transform:
-        translateY(-4px);
+                        </div>
 
-    border-color:
-        rgba(0, 220, 255, 0.55);
 
-    box-shadow:
-        0 10px 30px
-        rgba(0, 170, 230, 0.08);
+                        <div class="progress-bar">
 
-}
+                            <div
+                                id="progressFill"
+                                class="progress-fill"
+                            ></div>
 
+                        </div>
 
-.panel-header {
+                    </div>
 
-    display: flex;
 
-    align-items: center;
 
-    gap: 12px;
+                    <!-- CURRENT TASK -->
 
-    margin-bottom: 18px;
+                    <div class="current-task">
 
-}
+                        <div class="response-label">
+                            CURRENT TASK
+                        </div>
 
 
-.panel-icon {
+                        <div id="currentTask">
 
-    color: #00d9ff;
+                            Prepare to begin.
 
-    font-size: 20px;
+                        </div>
 
-    text-shadow:
-        0 0 10px
-        rgba(0, 217, 255, 0.8);
+                    </div>
 
-}
 
 
-.panel h2 {
+                    <!-- CONTROLS -->
 
-    font-size: 14px;
+                    <div class="session-controls">
 
-    letter-spacing: 2px;
+                        <button
+                            onclick="startTimer()"
+                            id="startTimerButton"
+                        >
 
-    font-weight: 500;
+                            ▶ START
 
-}
+                        </button>
 
 
-.panel p {
+                        <button
+                            onclick="pauseTimer()"
+                        >
 
-    color: #789daa;
+                            ⏸ PAUSE
 
-    font-size: 12px;
+                        </button>
 
-    line-height: 1.6;
 
-    margin-bottom: 18px;
+                        <button
+                            onclick="resetTimer()"
+                        >
 
-}
+                            ↻ RESET
 
+                        </button>
 
-.panel button {
 
-    margin-top: auto;
+                        <button
+                            onclick="finishStudySession()"
+                        >
 
-}
+                            ✓ FINISH
 
+                        </button>
 
-/* =====================================================
-   SYSTEM DATA
-   ===================================================== */
+                    </div>
 
-.system-data {
 
-    display: flex;
+                </div>
 
-    flex-direction: column;
+            </div>
 
-    gap: 14px;
+        </section>
 
-}
 
 
-.system-data div {
+        <!-- =================================================
+             HOMEWORK MANAGER
+             ================================================= -->
 
-    display: flex;
+        <section
+            id="homeworkManager"
+            class="homework-manager"
+        >
 
-    justify-content: space-between;
+            <div class="homework-manager-box">
 
-    padding-bottom: 9px;
 
-    border-bottom:
-        1px solid
-        rgba(0, 200, 255, 0.1);
+                <!-- HEADER -->
 
-}
+                <div class="homework-manager-header">
 
+                    <div>
 
-.system-data span {
+                        <div class="small-text">
+                            J.A.R.V.I.S.
+                        </div>
 
-    color: #668995;
+                        <h2>
+                            HOMEWORK MANAGER
+                        </h2>
 
-    font-size: 11px;
+                    </div>
 
-}
 
+                    <button
+                        onclick="closeHomework()"
+                        class="close-button"
+                    >
 
-.system-data strong {
+                        ×
 
-    color: #00ffb3;
+                    </button>
 
-    font-size: 10px;
+                </div>
 
-    letter-spacing: 1px;
 
-}
 
+                <p class="homework-description">
 
-/* =====================================================
-   STUDY HUB OVERLAY
-   ===================================================== */
+                    Organise your assignments, track deadlines
+                    and stay on top of your schoolwork.
 
-.study-hub {
+                </p>
 
-    position: fixed;
 
-    inset: 0;
 
-    z-index: 100;
+                <!-- =================================================
+                     ADD HOMEWORK
+                     ================================================= -->
 
-    display: flex;
+                <div class="homework-add-section">
 
-    justify-content: center;
+                    <div class="response-label">
+                        ADD HOMEWORK
+                    </div>
 
-    align-items: center;
 
-    padding: 25px;
 
-    background:
-        rgba(0, 5, 12, 0.82);
+                    <!-- SUBJECT -->
 
-    backdrop-filter:
-        blur(10px);
+                    <div class="homework-field">
 
-    opacity: 0;
+                        <label for="homeworkSubject">
+                            SUBJECT
+                        </label>
 
-    visibility: hidden;
 
-    pointer-events: none;
+                        <select id="homeworkSubject">
 
-    transition:
-        opacity 0.3s ease,
-        visibility 0.3s ease;
+                            <option value="Physics">
+                                Physics
+                            </option>
 
-}
+                            <option value="Chemistry">
+                                Chemistry
+                            </option>
 
+                            <option value="Mathematics">
+                                Mathematics
+                            </option>
 
-.study-hub.active {
+                            <option value="Social Studies">
+                                Social Studies
+                            </option>
 
-    opacity: 1;
+                            <option value="English">
+                                English
+                            </option>
 
-    visibility: visible;
+                            <option value="Tamil">
+                                Tamil
+                            </option>
 
-    pointer-events: auto;
+                            <option value="Other">
+                                Other
+                            </option>
 
-}
+                        </select>
 
+                    </div>
 
-/* =====================================================
-   STUDY HUB BOX
-   ===================================================== */
 
-.study-hub-box {
 
-    width: min(
-        760px,
-        100%
-    );
+                    <!-- TASK -->
 
-    max-height: 90vh;
+                    <div class="homework-field">
 
-    overflow-y: auto;
+                        <label for="homeworkTask">
+                            HOMEWORK TASK
+                        </label>
 
-    padding: 30px;
 
-    border:
-        1px solid
-        rgba(0, 220, 255, 0.55);
+                        <input
+                            id="homeworkTask"
+                            type="text"
+                            placeholder="e.g. Complete Physics worksheet"
+                        >
 
-    background:
-        linear-gradient(
-            145deg,
-            rgba(5, 25, 40, 0.98),
-            rgba(2, 10, 19, 0.98)
-        );
+                    </div>
 
-    box-shadow:
 
-        0 0 30px
-        rgba(0, 190, 255, 0.12),
 
-        inset 0 0 50px
-        rgba(0, 170, 255, 0.035);
+                    <!-- DATE + PRIORITY -->
 
-    transform:
-        translateY(20px)
-        scale(0.98);
+                    <div class="homework-row">
 
-    transition:
-        0.3s;
 
-}
+                        <div class="homework-field">
 
+                            <label for="homeworkDueDate">
+                                DUE DATE
+                            </label>
 
-.study-hub.active
-.study-hub-box {
 
-    transform:
-        translateY(0)
-        scale(1);
+                            <input
+                                id="homeworkDueDate"
+                                type="date"
+                            >
 
-}
+                        </div>
 
 
-/* =====================================================
-   STUDY HUB HEADER
-   ===================================================== */
 
-.study-hub-header {
+                        <div class="homework-field">
 
-    display: flex;
+                            <label for="homeworkPriority">
+                                PRIORITY
+                            </label>
 
-    justify-content: space-between;
 
-    align-items: flex-start;
+                            <select id="homeworkPriority">
 
-    padding-bottom: 20px;
+                                <option value="Low">
+                                    Low
+                                </option>
 
-    border-bottom:
-        1px solid
-        rgba(0, 210, 255, 0.2);
+                                <option
+                                    value="Medium"
+                                    selected
+                                >
+                                    Medium
+                                </option>
 
-}
+                                <option value="High">
+                                    High
+                                </option>
 
+                            </select>
 
-.study-hub-header h2 {
+                        </div>
 
-    margin-top: 7px;
+                    </div>
 
-    font-size: 25px;
 
-    letter-spacing: 4px;
 
-    color: #e8fbff;
+                    <!-- ADD BUTTON -->
 
-    text-shadow:
-        0 0 12px
-        rgba(0, 210, 255, 0.45);
+                    <button
+                        onclick="addHomework()"
+                        class="homework-add-button"
+                    >
 
-}
+                        + ADD HOMEWORK
 
+                    </button>
 
-.close-button {
+                </div>
 
-    width: 38px;
 
-    height: 38px;
 
-    padding: 0;
+                <!-- =================================================
+                     HOMEWORK LIST
+                     ================================================= -->
 
-    font-size: 25px;
+                <div class="homework-list-section">
 
-    line-height: 1;
 
-    color: #83cddd;
+                    <div class="homework-list-header">
 
-}
+                        <div class="response-label">
+                            YOUR HOMEWORK
+                        </div>
 
 
-.close-button:hover {
+                        <button
+                            onclick="clearCompletedHomework()"
+                            class="small-action-button"
+                        >
 
-    color: #ffffff;
+                            CLEAR COMPLETED
 
-}
+                        </button>
 
+                    </div>
 
-/* =====================================================
-   STUDY DESCRIPTION
-   ===================================================== */
 
-.study-description {
 
-    margin: 20px 0 25px;
+                    <div
+                        id="homeworkList"
+                        class="homework-list"
+                    >
 
-    color: #7ea7b4;
+                        <div class="empty-homework">
 
-    font-size: 13px;
+                            No homework tasks yet.
 
-    line-height: 1.6;
+                        </div>
 
-}
+                    </div>
 
+                </div>
 
-/* =====================================================
-   STUDY FIELDS
-   ===================================================== */
+            </div>
 
-.study-field {
+        </section>
 
-    margin-bottom: 19px;
+    </main>
 
-}
 
 
-.study-field label {
+    <!-- =================================================
+         FOOTER
+         ================================================= -->
 
-    display: block;
+    <footer>
 
-    margin-bottom: 8px;
+        J.A.R.V.I.S.
 
-    color: #5fcce8;
+        <span>•</span>
 
-    font-size: 10px;
+        PERSONAL STUDENT ASSISTANT
 
-    letter-spacing: 2px;
+        <span>•</span>
 
-}
+        PROTOTYPE 8
 
+    </footer>
 
-.study-field input,
-.study-field select {
 
-    width: 100%;
 
-    padding: 14px;
+    <!-- =================================================
+         JAVASCRIPT
+         ================================================= -->
 
-    border:
-        1px solid
-        rgba(0, 200, 255, 0.28);
+    <script src="script.js"></script>
 
-    background:
-        rgba(0, 9, 18, 0.9);
+</body>
 
-    color: #dffaff;
-
-    outline: none;
-
-    font-size: 13px;
-
-}
-
-
-.study-field input:focus,
-.study-field select:focus {
-
-    border-color:
-        #00d9ff;
-
-    box-shadow:
-        0 0 14px
-        rgba(0, 217, 255, 0.15);
-
-}
-
-
-.study-field select option {
-
-    background:
-        #071521;
-
-    color:
-        #dffaff;
-
-}
-
-
-/* =====================================================
-   STUDY START BUTTON
-   ===================================================== */
-
-.study-start-button {
-
-    width: 100%;
-
-    margin-top: 8px;
-
-    padding: 16px;
-
-    color: #dfffff;
-
-    border-color:
-        rgba(0, 230, 255, 0.7);
-
-    background:
-        linear-gradient(
-            90deg,
-            rgba(0, 120, 170, 0.18),
-            rgba(0, 210, 255, 0.13),
-            rgba(0, 120, 170, 0.18)
-        );
-
-    letter-spacing: 2px;
-
-}
-
-
-.study-start-button:hover {
-
-    box-shadow:
-        0 0 25px
-        rgba(0, 210, 255, 0.2);
-
-}
-
-
-/* =====================================================
-   STUDY RESULT
-   ===================================================== */
-
-.study-result {
-
-    margin-top: 25px;
-
-    padding: 20px;
-
-    border:
-        1px solid
-        rgba(0, 210, 255, 0.2);
-
-    background:
-        rgba(0, 10, 20, 0.7);
-
-    color: #a9dbe7;
-
-    font-size: 13px;
-
-    line-height: 1.7;
-
-}
-
-
-.study-result p {
-
-    margin-bottom: 10px;
-
-}
-
-
-.study-result hr {
-
-    border: 0;
-
-    border-top:
-        1px solid
-        rgba(0, 210, 255, 0.16);
-
-    margin:
-        18px 0;
-
-}
-
-
-.study-ai-response h3,
-.study-ai-response h4 {
-
-    color: #75e6ff;
-
-    margin:
-        15px 0 8px;
-
-    letter-spacing: 1px;
-
-}
-
-
-.study-ai-response p {
-
-    margin:
-        7px 0;
-
-}
-
-
-/* =====================================================
-   ACTIVE STUDY SESSION
-   ===================================================== */
-
-.active-study-session {
-
-    display: none;
-
-    margin-top: 25px;
-
-    padding: 25px;
-
-    border:
-        1px solid
-        rgba(0, 220, 255, 0.4);
-
-    background:
-        rgba(0, 12, 22, 0.85);
-
-    box-shadow:
-        inset 0 0 30px
-        rgba(0, 180, 255, 0.03);
-
-}
-
-
-.active-study-session.session-visible {
-
-    display: block;
-
-    animation:
-        sessionAppear 0.4s ease;
-
-}
-
-
-/* =====================================================
-   SESSION APPEAR ANIMATION
-   ===================================================== */
-
-@keyframes sessionAppear {
-
-    from {
-
-        opacity: 0;
-
-        transform:
-            translateY(10px);
-
-    }
-
-    to {
-
-        opacity: 1;
-
-        transform:
-            translateY(0);
-
-    }
-
-}
-
-
-/* =====================================================
-   SESSION HEADER
-   ===================================================== */
-
-.session-header {
-
-    display: flex;
-
-    justify-content: space-between;
-
-    align-items: flex-start;
-
-    gap: 20px;
-
-}
-
-
-.session-header h3 {
-
-    margin-bottom: 5px;
-
-    color: #dffaff;
-
-    font-size: 20px;
-
-    letter-spacing: 1px;
-
-}
-
-
-.session-header p {
-
-    color: #72a7b5;
-
-    font-size: 12px;
-
-}
-
-
-/* =====================================================
-   SESSION STATUS
-   ===================================================== */
-
-.session-status {
-
-    padding:
-        8px 12px;
-
-    border:
-        1px solid
-        rgba(0, 255, 179, 0.45);
-
-    color:
-        #00ffb3;
-
-    font-size: 9px;
-
-    letter-spacing: 2px;
-
-}
-
-
-/* =====================================================
-   TIMER
-   ===================================================== */
-
-.study-timer {
-
-    text-align: center;
-
-    margin:
-        30px 0;
-
-}
-
-
-.timer-display {
-
-    font-family:
-        "Courier New",
-        monospace;
-
-    font-size: 64px;
-
-    font-weight: bold;
-
-    letter-spacing: 5px;
-
-    color: #dfffff;
-
-    text-shadow:
-
-        0 0 10px
-        rgba(0, 220, 255, 0.8),
-
-        0 0 30px
-        rgba(0, 220, 255, 0.25);
-
-}
-
-
-.timer-label {
-
-    margin-top: 5px;
-
-    color: #4d8594;
-
-    font-size: 9px;
-
-    letter-spacing: 3px;
-
-}
-
-
-/* =====================================================
-   PROGRESS
-   ===================================================== */
-
-.progress-section {
-
-    margin:
-        20px 0;
-
-}
-
-
-.progress-info {
-
-    display: flex;
-
-    justify-content: space-between;
-
-    margin-bottom: 8px;
-
-    color: #6395a2;
-
-    font-size: 9px;
-
-    letter-spacing: 1.5px;
-
-}
-
-
-.progress-bar {
-
-    height: 7px;
-
-    overflow: hidden;
-
-    border:
-        1px solid
-        rgba(0, 210, 255, 0.25);
-
-    background:
-        rgba(0, 20, 30, 0.8);
-
-}
-
-
-.progress-fill {
-
-    width: 0%;
-
-    height: 100%;
-
-    background:
-        linear-gradient(
-            90deg,
-            #007caa,
-            #00d9ff
-        );
-
-    box-shadow:
-        0 0 12px
-        rgba(0, 217, 255, 0.7);
-
-    transition:
-        width 1s linear;
-
-}
-
-
-/* =====================================================
-   CURRENT TASK
-   ===================================================== */
-
-.current-task {
-
-    margin-top: 25px;
-
-    padding: 18px;
-
-    border-left:
-        3px solid
-        #00d9ff;
-
-    background:
-        rgba(0, 100, 140, 0.08);
-
-    color: #bdebf5;
-
-    line-height: 1.6;
-
-}
-
-
-/* =====================================================
-   SESSION CONTROLS
-   ===================================================== */
-
-.session-controls {
-
-    display: grid;
-
-    grid-template-columns:
-        repeat(
-            4,
-            1fr
-        );
-
-    gap: 8px;
-
-    margin-top: 20px;
-
-}
-
-
-.session-controls button {
-
-    padding:
-        13px 8px;
-
-    font-size: 9px;
-
-}
-
-
-.session-controls button:hover {
-
-    box-shadow:
-        0 0 15px
-        rgba(0, 210, 255, 0.18);
-
-}
-
-
-/* =====================================================
-   FOOTER
-   ===================================================== */
-
-footer {
-
-    padding:
-        25px;
-
-    text-align: center;
-
-    border-top:
-        1px solid
-        rgba(0, 210, 255, 0.15);
-
-    color: #496c78;
-
-    font-size: 9px;
-
-    letter-spacing: 2px;
-
-}
-
-
-footer span {
-
-    color: #00bddd;
-
-    margin:
-        0 7px;
-
-}
-
-
-/* =====================================================
-   RESPONSIVE - TABLET
-   ===================================================== */
-
-@media (
-    max-width: 900px
-) {
-
-    .dashboard {
-
-        grid-template-columns:
-            repeat(
-                2,
-                1fr
-            );
-
-    }
-
-
-    header {
-
-        padding:
-            20px 25px;
-
-    }
-
-}
-
-
-/* =====================================================
-   RESPONSIVE - MOBILE
-   ===================================================== */
-
-@media (
-    max-width: 600px
-) {
-
-    header {
-
-        flex-direction: column;
-
-        gap: 12px;
-
-        text-align: center;
-
-    }
-
-
-    .logo {
-
-        font-size: 23px;
-
-    }
-
-
-    main {
-
-        width: 94%;
-
-        margin:
-            25px auto;
-
-    }
-
-
-    .main-panel {
-
-        padding:
-            30px 15px;
-
-        min-height:
-            500px;
-
-    }
-
-
-    .core {
-
-        width: 230px;
-
-        height: 230px;
-
-    }
-
-
-    .ring-one {
-
-        width: 110px;
-        height: 110px;
-
-    }
-
-
-    .ring-two {
-
-        width: 150px;
-        height: 150px;
-
-    }
-
-
-    .ring-three {
-
-        width: 190px;
-        height: 190px;
-
-    }
-
-
-    .ring-four {
-
-        width: 225px;
-        height: 225px;
-
-    }
-
-
-    .core-center {
-
-        width: 80px;
-        height: 80px;
-
-    }
-
-
-    .core-center span {
-
-        font-size: 38px;
-
-    }
-
-
-    .command-area {
-
-        flex-wrap: wrap;
-
-    }
-
-
-    .command-area input {
-
-        width: 100%;
-
-        flex-basis: 100%;
-
-    }
-
-
-    .send-button {
-
-        flex: 1;
-
-    }
-
-
-    .voice-button {
-
-        width: 55px;
-
-    }
-
-
-    .dashboard {
-
-        grid-template-columns:
-            1fr;
-
-    }
-
-
-    .study-hub {
-
-        padding:
-            12px;
-
-    }
-
-
-    .study-hub-box {
-
-        padding:
-            20px;
-
-        max-height:
-            94vh;
-
-    }
-
-
-    .study-hub-header h2 {
-
-        font-size: 20px;
-
-    }
-
-
-    /* =============================================
-       MOBILE STUDY SESSION
-       ============================================= */
-
-    .timer-display {
-
-        font-size: 45px;
-
-    }
-
-
-    .session-header {
-
-        flex-direction: column;
-
-    }
-
-
-    .session-controls {
-
-        grid-template-columns:
-            repeat(
-                2,
-                1fr
-            );
-
-    }
-
-}
+</html>
