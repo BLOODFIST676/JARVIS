@@ -1,52 +1,34 @@
-/* =====================================================
-   J.A.R.V.I.S.
-   FUTURISTIC STUDENT ASSISTANT INTERFACE
-   ===================================================== */
-
-
-/* =====================================================
-   GLOBAL
-   ===================================================== */
-
 * {
     box-sizing: border-box;
-    margin: 0;
-    padding: 0;
 }
-
-
-html {
-    scroll-behavior: smooth;
-}
-
 
 body {
+    margin: 0;
     min-height: 100vh;
 
     font-family:
-        "Segoe UI",
         Arial,
+        Helvetica,
         sans-serif;
+
+    color: #dff8ff;
 
     background:
         radial-gradient(
             circle at center,
-            #101d2d 0%,
-            #07101b 45%,
-            #02060b 100%
+            #102b42 0%,
+            #06121d 40%,
+            #02070c 100%
         );
-
-    color: #d9f7ff;
 
     overflow-x: hidden;
 }
 
 
-/* =====================================================
-   BACKGROUND
-   ===================================================== */
+/* GRID */
 
-.background-grid {
+body::before {
+    content: "";
 
     position: fixed;
 
@@ -54,1264 +36,611 @@ body {
 
     pointer-events: none;
 
-    opacity: 0.28;
-
     background-image:
         linear-gradient(
-            rgba(0, 220, 255, 0.08) 1px,
+            rgba(70, 210, 255, 0.05) 1px,
             transparent 1px
         ),
         linear-gradient(
             90deg,
-            rgba(0, 220, 255, 0.08) 1px,
+            rgba(70, 210, 255, 0.05) 1px,
             transparent 1px
         );
 
-    background-size:
-        45px 45px;
-
-    z-index: -3;
+    background-size: 40px 40px;
 }
 
 
-.background-grid::after {
+/* SCANLINE */
 
-    content: "";
-
-    position: absolute;
-
-    inset: 0;
-
-    background:
-        radial-gradient(
-            circle at center,
-            transparent 20%,
-            rgba(0, 0, 0, 0.65) 100%
-        );
-
-}
-
-
-/* =====================================================
-   SCAN LINE
-   ===================================================== */
-
-.scan-line {
-
+.scanline {
     position: fixed;
 
-    top: -10%;
-
+    top: 0;
     left: 0;
 
     width: 100%;
-
     height: 2px;
 
-    background:
-        linear-gradient(
-            90deg,
-            transparent,
-            rgba(0, 220, 255, 0.7),
-            transparent
-        );
+    background: rgba(70, 220, 255, 0.5);
 
-    box-shadow:
-        0 0 20px rgba(0, 220, 255, 0.7);
-
-    opacity: 0.5;
+    animation: scan 6s linear infinite;
 
     pointer-events: none;
 
-    z-index: 999;
-
-    animation:
-        scan 7s linear infinite;
+    z-index: 100;
 }
-
 
 @keyframes scan {
 
     0% {
-        top: -5%;
+        top: 0;
     }
 
     100% {
-        top: 105%;
+        top: 100%;
     }
 
 }
 
 
-/* =====================================================
-   HEADER
-   ===================================================== */
+/* HEADER */
 
 header {
 
-    width: 100%;
-
-    padding:
-        24px 6%;
-
     display: flex;
 
+    justify-content: space-between;
     align-items: center;
 
-    justify-content: space-between;
+    padding: 25px 40px;
 
     border-bottom:
-        1px solid
-        rgba(0, 220, 255, 0.18);
+        1px solid rgba(80, 210, 255, 0.2);
 
-    background:
-        rgba(2, 9, 16, 0.72);
-
-    backdrop-filter:
-        blur(12px);
-
-    position: relative;
-
-    z-index: 10;
 }
 
+.brand-title {
 
-.logo {
+    font-size: 28px;
 
-    font-size: 1.8rem;
+    letter-spacing: 7px;
 
-    font-weight: 700;
-
-    letter-spacing: 0.28rem;
-
-    color: #e7fbff;
-
-    text-shadow:
-        0 0 15px
-        rgba(0, 220, 255, 0.5);
+    font-weight: bold;
 }
 
+.brand-subtitle {
 
-.subtitle {
+    margin-top: 5px;
 
-    display: block;
+    font-size: 10px;
 
-    margin-top: 4px;
+    letter-spacing: 3px;
 
-    font-size: 0.55rem;
-
-    letter-spacing: 0.25rem;
-
-    color: #5caabb;
-
-    font-weight: 500;
+    opacity: 0.6;
 }
-
 
 .system-status {
 
-    font-size: 0.75rem;
+    font-size: 12px;
 
-    letter-spacing: 0.12rem;
-
-    color: #7edbea;
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 8px;
+    letter-spacing: 2px;
 }
-
 
 .status-dot {
 
-    color: #42e6ff;
+    display: inline-block;
 
-    text-shadow:
-        0 0 10px
-        #42e6ff;
+    width: 8px;
+    height: 8px;
 
-    animation:
-        pulse 1.8s infinite;
+    margin-right: 8px;
+
+    border-radius: 50%;
+
+    background: #65e6ff;
+
+    box-shadow:
+        0 0 12px #65e6ff;
 }
 
 
-@keyframes pulse {
-
-    0%,
-    100% {
-        opacity: 1;
-    }
-
-    50% {
-        opacity: 0.35;
-    }
-
-}
-
-
-/* =====================================================
-   MAIN
-   ===================================================== */
+/* MAIN */
 
 main {
 
-    width: min(
-        1250px,
-        92%
-    );
+    max-width: 1200px;
 
-    margin:
-        45px auto 60px;
+    margin: auto;
+
+    padding: 30px 20px 80px;
 }
 
 
-/* =====================================================
-   CENTRAL PANEL
-   ===================================================== */
+/* CORE */
 
-.main-panel {
-
-    padding:
-        45px 35px;
+.core-section {
 
     text-align: center;
 
-    border:
-        1px solid
-        rgba(0, 220, 255, 0.24);
+    padding: 20px 0 30px;
+}
 
-    border-radius: 22px;
-
-    background:
-        linear-gradient(
-            145deg,
-            rgba(10, 27, 42, 0.92),
-            rgba(3, 11, 19, 0.95)
-        );
-
-    box-shadow:
-        0 0 60px
-        rgba(0, 180, 255, 0.08),
-
-        inset 0 0 40px
-        rgba(0, 180, 255, 0.025);
+.jarvis-core {
 
     position: relative;
-
-    overflow: hidden;
-}
-
-
-.main-panel::before {
-
-    content: "";
-
-    position: absolute;
-
-    inset: 0;
-
-    pointer-events: none;
-
-    background:
-        radial-gradient(
-            circle at center,
-            rgba(0, 210, 255, 0.06),
-            transparent 48%
-        );
-
-}
-
-
-.small-text {
-
-    font-size: 0.65rem;
-
-    letter-spacing: 0.24rem;
-
-    color: #5594a4;
-
-    margin-bottom: 18px;
-}
-
-
-/* =====================================================
-   JARVIS CORE
-   ===================================================== */
-
-.core {
 
     width: 230px;
-
     height: 230px;
 
-    margin:
-        25px auto 30px;
-
-    position: relative;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
+    margin: auto;
 }
-
 
 .core-ring {
 
     position: absolute;
 
+    inset: 0;
+
     border-radius: 50%;
 
     border:
-        1px solid
-        rgba(54, 221, 255, 0.5);
+        1px solid rgba(80, 220, 255, 0.7);
 
     box-shadow:
-        0 0 18px
-        rgba(0, 200, 255, 0.18);
+        0 0 20px rgba(80, 220, 255, 0.25);
 
 }
-
 
 .ring-one {
 
-    width: 230px;
-
-    height: 230px;
-
     animation:
-        rotateClockwise
-        12s linear infinite;
+        spin 8s linear infinite;
 }
-
 
 .ring-two {
 
-    width: 190px;
-
-    height: 190px;
-
-    border-style: dashed;
+    inset: 20px;
 
     animation:
-        rotateCounter
-        9s linear infinite;
+        spinReverse 6s linear infinite;
 }
-
 
 .ring-three {
 
-    width: 150px;
-
-    height: 150px;
-
-    border:
-        2px solid
-        rgba(67, 228, 255, 0.42);
+    inset: 45px;
 
     animation:
-        rotateClockwise
-        7s linear infinite;
+        spin 4s linear infinite;
 }
-
-
-.ring-four {
-
-    width: 115px;
-
-    height: 115px;
-
-    border:
-        1px dashed
-        rgba(117, 240, 255, 0.7);
-
-    animation:
-        rotateCounter
-        5s linear infinite;
-}
-
-
-@keyframes rotateClockwise {
-
-    from {
-        transform: rotate(0deg);
-    }
-
-    to {
-        transform: rotate(360deg);
-    }
-
-}
-
-
-@keyframes rotateCounter {
-
-    from {
-        transform: rotate(360deg);
-    }
-
-    to {
-        transform: rotate(0deg);
-    }
-
-}
-
 
 .core-center {
 
-    width: 76px;
+    position: absolute;
 
-    height: 76px;
+    top: 50%;
+    left: 50%;
 
-    border-radius: 50%;
+    transform:
+        translate(-50%, -50%);
+
+    width: 100px;
+    height: 100px;
 
     display: flex;
 
     align-items: center;
-
     justify-content: center;
 
-    background:
-        radial-gradient(
-            circle,
-            #55eaff 0%,
-            #0c7891 35%,
-            #062c3c 70%,
-            #020a10 100%
-        );
+    border-radius: 50%;
 
     border:
-        2px solid
-        rgba(116, 240, 255, 0.85);
+        2px solid #69e8ff;
 
     box-shadow:
-        0 0 25px
-        rgba(0, 225, 255, 0.75),
+        0 0 30px rgba(80, 220, 255, 0.6),
+        inset 0 0 25px rgba(80, 220, 255, 0.2);
 
-        0 0 65px
-        rgba(0, 180, 255, 0.25);
+    font-size: 40px;
+
+    font-weight: bold;
+
+}
+
+@keyframes spin {
+
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+
+}
+
+@keyframes spinReverse {
+
+    from {
+        transform: rotate(360deg);
+    }
+
+    to {
+        transform: rotate(0deg);
+    }
+
+}
+
+.voice-status {
+
+    margin-top: 15px;
+
+    font-size: 11px;
+
+    letter-spacing: 2px;
+
+    opacity: 0.6;
 }
 
 
-.core-center span {
+/* COMMAND */
 
-    font-size: 2rem;
+.command-section {
 
-    font-weight: 700;
-
-    color: white;
-
-    text-shadow:
-        0 0 12px
-        white;
-}
-
-
-.ready {
-
-    font-size: 0.75rem;
-
-    letter-spacing: 0.18rem;
-
-    color: #6ed9e8;
-
-    margin-bottom: 30px;
-}
-
-
-.status-indicator {
-
-    color: #42e6ff;
-
-    text-shadow:
-        0 0 10px
-        #42e6ff;
-}
-
-
-/* =====================================================
-   COMMAND AREA
-   ===================================================== */
-
-.command-area {
-
-    width: min(
-        800px,
-        100%
-    );
+    max-width: 850px;
 
     margin: auto;
+}
+
+.command-box {
 
     display: flex;
 
     gap: 10px;
 }
 
-
-.command-area input {
+.command-box input {
 
     flex: 1;
 
-    min-width: 0;
-
-    padding:
-        16px 18px;
-
-    border:
-        1px solid
-        rgba(62, 220, 255, 0.3);
-
-    border-radius: 10px;
-
-    outline: none;
+    padding: 16px;
 
     background:
-        rgba(2, 15, 25, 0.9);
-
-    color: #e8fbff;
-
-    font-size: 0.95rem;
-
-    transition:
-        0.25s;
-}
-
-
-.command-area input::placeholder {
-
-    color: #527683;
-}
-
-
-.command-area input:focus {
-
-    border-color:
-        #3bdcff;
-
-    box-shadow:
-        0 0 20px
-        rgba(0, 220, 255, 0.12);
-}
-
-
-/* =====================================================
-   BUTTONS
-   ===================================================== */
-
-button {
+        rgba(0, 15, 25, 0.8);
 
     border:
-        1px solid
-        rgba(62, 220, 255, 0.35);
-
-    background:
-        rgba(6, 30, 43, 0.85);
-
-    color: #a9f1ff;
-
-    padding:
-        11px 17px;
-
-    border-radius: 8px;
-
-    cursor: pointer;
-
-    font-size: 0.72rem;
-
-    letter-spacing: 0.1rem;
-
-    transition:
-        all 0.25s ease;
-}
-
-
-button:hover {
-
-    border-color:
-        #45e5ff;
+        1px solid rgba(80, 210, 255, 0.35);
 
     color: white;
 
+    outline: none;
+
+    font-size: 15px;
+}
+
+button {
+
+    cursor: pointer;
+
+    border: none;
+
+    color: #dffaff;
+
     background:
-        rgba(11, 57, 75, 0.95);
+        rgba(20, 90, 120, 0.35);
+
+    border:
+        1px solid rgba(80, 210, 255, 0.45);
+
+    transition: 0.2s;
+}
+
+button:hover {
+
+    background:
+        rgba(50, 150, 190, 0.45);
 
     box-shadow:
-        0 0 18px
-        rgba(0, 215, 255, 0.18);
-
-    transform:
-        translateY(-1px);
+        0 0 15px rgba(80, 220, 255, 0.25);
 }
 
 
-button:active {
+/* RESPONSE */
 
-    transform:
-        translateY(0);
+.response-section {
+
+    max-width: 850px;
+
+    margin: 25px auto 40px;
 }
 
+.section-title {
 
-.send-button {
+    font-size: 11px;
 
-    padding-left: 25px;
+    letter-spacing: 3px;
 
-    padding-right: 25px;
+    margin-bottom: 8px;
 
-    font-weight: 700;
+    opacity: 0.6;
 }
-
-
-/* =====================================================
-   RESPONSE
-   ===================================================== */
 
 .response-box {
 
-    width: min(
-        800px,
-        100%
-    );
+    min-height: 90px;
 
-    margin:
-        25px auto 0;
+    padding: 18px;
 
-    padding:
-        18px 20px;
-
-    text-align: left;
-
-    border-left:
-        2px solid
-        #38ddff;
-
-    border-radius: 8px;
-
-    background:
-        rgba(2, 14, 23, 0.75);
-
-    min-height: 70px;
-}
-
-
-.response-label {
-
-    display: block;
-
-    font-size: 0.62rem;
-
-    letter-spacing: 0.18rem;
-
-    color: #55bfd2;
-
-    margin-bottom: 8px;
-}
-
-
-.response-text {
-
-    display: block;
+    white-space: pre-wrap;
 
     line-height: 1.6;
 
-    color: #cceef4;
+    background:
+        rgba(0, 15, 25, 0.7);
 
-    font-size: 0.9rem;
+    border:
+        1px solid rgba(80, 210, 255, 0.25);
+
 }
 
 
-/* =====================================================
-   DASHBOARD
-   ===================================================== */
+/* DASHBOARD */
 
 .dashboard {
-
-    margin-top: 25px;
 
     display: grid;
 
     grid-template-columns:
-        repeat(
-            3,
-            1fr
-        );
+        repeat(2, 1fr);
 
     gap: 18px;
 }
 
-
 .panel {
 
-    padding:
-        23px;
+    padding: 22px;
 
-    min-height: 190px;
-
-    border:
-        1px solid
-        rgba(0, 210, 255, 0.16);
-
-    border-radius: 16px;
+    min-height: 150px;
 
     background:
-        rgba(5, 18, 29, 0.82);
+        rgba(4, 20, 31, 0.75);
 
-    transition:
-        0.25s;
-
-    position: relative;
-
-    overflow: hidden;
-}
-
-
-.panel:hover {
-
-    transform:
-        translateY(-3px);
-
-    border-color:
-        rgba(0, 220, 255, 0.38);
+    border:
+        1px solid rgba(80, 210, 255, 0.2);
 
     box-shadow:
-        0 10px 35px
-        rgba(0, 180, 255, 0.08);
+        inset 0 0 25px rgba(40, 150, 200, 0.04);
+
+}
+
+.panel.clickable {
+
+    cursor: pointer;
+}
+
+.panel-title {
+
+    margin-bottom: 15px;
+
+    font-size: 13px;
+
+    letter-spacing: 3px;
+
+    color: #78eaff;
+}
+
+.panel-button {
+
+    margin-top: 20px;
+
+    padding: 9px 13px;
+
+    font-size: 10px;
+
+    letter-spacing: 2px;
 }
 
 
-.panel-header {
+/* SYSTEM */
 
-    display: flex;
+.system-info {
 
-    align-items: center;
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
 
     gap: 10px;
+}
 
-    margin-bottom: 17px;
+.system-info div {
+
+    padding: 12px;
+
+    background:
+        rgba(0, 20, 30, 0.5);
+
+}
+
+.system-info span {
+
+    display: block;
+
+    font-size: 9px;
+
+    opacity: 0.5;
+}
+
+.system-info strong {
+
+    display: block;
+
+    margin-top: 6px;
+
+    font-size: 12px;
 }
 
 
-.panel-header h2 {
+/* MODALS */
 
-    font-size: 0.85rem;
+.modal {
 
-    letter-spacing: 0.12rem;
-
-    font-weight: 600;
-}
-
-
-.panel-icon {
-
-    color: #43dffb;
-
-    font-size: 1.1rem;
-
-    text-shadow:
-        0 0 10px
-        rgba(0, 220, 255, 0.5);
-}
-
-
-.panel p {
-
-    color: #7299a5;
-
-    font-size: 0.82rem;
-
-    line-height: 1.6;
-
-    margin-bottom: 20px;
-}
-
-
-/* =====================================================
-   SYSTEM PANEL
-   ===================================================== */
-
-.system-data {
-
-    display: flex;
-
-    flex-direction: column;
-
-    gap: 12px;
-}
-
-
-.system-data div {
-
-    display: flex;
-
-    justify-content: space-between;
-
-    align-items: center;
-
-    padding:
-        9px 0;
-
-    border-bottom:
-        1px solid
-        rgba(255,255,255,0.04);
-}
-
-
-.system-data span {
-
-    color: #608b97;
-
-    font-size: 0.68rem;
-
-    letter-spacing: 0.1rem;
-}
-
-
-.system-data strong {
-
-    color: #55dff4;
-
-    font-size: 0.68rem;
-
-    letter-spacing: 0.08rem;
-}
-
-
-/* =====================================================
-   HOMEWORK SUMMARY
-   ===================================================== */
-
-.homework-summary {
-
-    display: flex;
-
-    align-items: baseline;
-
-    gap: 10px;
-
-    margin:
-        5px 0 10px;
-}
-
-
-.homework-summary strong {
-
-    font-size: 2.2rem;
-
-    color: #65e8ff;
-
-    text-shadow:
-        0 0 15px
-        rgba(0, 220, 255, 0.3);
-}
-
-
-.homework-summary span {
-
-    font-size: 0.65rem;
-
-    letter-spacing: 0.15rem;
-
-    color: #5b8995;
-}
-
-
-/* =====================================================
-   MODAL BACKGROUNDS
-   ===================================================== */
-
-.study-hub,
-.homework-manager {
+    display: none;
 
     position: fixed;
 
     inset: 0;
 
-    z-index: 100;
+    background:
+        rgba(0, 5, 10, 0.82);
 
-    display: none;
+    z-index: 50;
+
+    overflow-y: auto;
+
+    padding: 30px 15px;
+}
+
+.modal.active {
+
+    display: flex;
 
     align-items: center;
-
     justify-content: center;
+}
+
+.modal-content {
+
+    position: relative;
+
+    width: min(600px, 100%);
 
     padding: 30px;
 
     background:
-        rgba(0, 5, 10, 0.82);
-
-    backdrop-filter:
-        blur(10px);
-
-    overflow-y: auto;
-}
-
-
-/* =====================================================
-   STUDY HUB BOX
-   ===================================================== */
-
-.study-hub-box {
-
-    width: min(
-        760px,
-        100%
-    );
-
-    max-height: 92vh;
-
-    overflow-y: auto;
-
-    padding: 32px;
+        #06141f;
 
     border:
-        1px solid
-        rgba(0, 220, 255, 0.3);
-
-    border-radius: 18px;
-
-    background:
-        linear-gradient(
-            145deg,
-            #091c2a,
-            #030b12
-        );
+        1px solid rgba(80, 220, 255, 0.4);
 
     box-shadow:
-        0 0 60px
-        rgba(0, 190, 255, 0.13);
+        0 0 40px rgba(50, 200, 255, 0.15);
 }
 
+.modal-content h2 {
 
-.study-hub-header,
-.homework-manager-header {
+    margin-top: 0;
 
-    display: flex;
+    letter-spacing: 4px;
 
-    align-items: flex-start;
-
-    justify-content: space-between;
-
-    gap: 20px;
+    font-size: 20px;
 }
 
-
-.study-hub-header h2,
-.homework-manager-header h2 {
-
-    font-size: 1.5rem;
-
-    letter-spacing: 0.16rem;
-}
-
-
-.close-button {
-
-    width: 38px;
-
-    height: 38px;
-
-    padding: 0;
-
-    font-size: 1.5rem;
-
-    line-height: 1;
-}
-
-
-.study-description,
-.homework-description {
-
-    margin:
-        20px 0 25px;
-
-    color: #7598a4;
-
-    line-height: 1.6;
-
-    font-size: 0.85rem;
-}
-
-
-/* =====================================================
-   STUDY FIELDS
-   ===================================================== */
-
-.study-field,
-.homework-field {
-
-    margin-bottom: 17px;
-}
-
-
-.study-field label,
-.homework-field label {
+.modal-content label {
 
     display: block;
 
-    margin-bottom: 7px;
+    margin:
+        15px 0 6px;
 
-    color: #6fa5b2;
+    font-size: 11px;
 
-    font-size: 0.62rem;
+    letter-spacing: 1px;
 
-    letter-spacing: 0.13rem;
+    opacity: 0.7;
 }
 
-
-.study-field input,
-.study-field select,
-.homework-field input,
-.homework-field select {
+.modal-content input,
+.modal-content select {
 
     width: 100%;
 
-    padding:
-        13px 14px;
-
-    border:
-        1px solid
-        rgba(67, 214, 241, 0.2);
-
-    border-radius: 8px;
+    padding: 12px;
 
     background:
-        #04121c;
+        #020b12;
 
-    color: #d7f7ff;
+    border:
+        1px solid rgba(80, 210, 255, 0.3);
+
+    color: white;
 
     outline: none;
+}
 
-    font-size: 0.85rem;
+.close-button {
+
+    position: absolute;
+
+    right: 15px;
+    top: 15px;
+
+    width: 32px;
+    height: 32px;
+
+    font-size: 20px;
 }
 
 
-.study-field input:focus,
-.study-field select:focus,
-.homework-field input:focus,
-.homework-field select:focus {
+/* BUTTONS */
 
-    border-color:
-        #36dfff;
-
-    box-shadow:
-        0 0 14px
-        rgba(0, 220, 255, 0.1);
-}
-
-
-.study-start-button,
-.homework-add-button {
+.primary-button,
+.secondary-button {
 
     width: 100%;
 
-    margin-top: 5px;
+    padding: 13px;
 
-    padding:
-        14px;
+    margin-top: 18px;
 
-    font-weight: 700;
+    letter-spacing: 2px;
 
-    background:
-        rgba(0, 111, 137, 0.25);
-
-    border-color:
-        rgba(65, 227, 255, 0.45);
+    font-size: 11px;
 }
 
-
-/* =====================================================
-   STUDY RESULT
-   ===================================================== */
-
-.study-result {
-
-    margin-top: 20px;
-
-    padding: 18px;
-
-    border:
-        1px solid
-        rgba(0, 210, 255, 0.12);
-
-    border-radius: 10px;
-
-    background:
-        rgba(0, 10, 18, 0.5);
-
-    color: #8fb7c0;
-
-    font-size: 0.85rem;
-
-    line-height: 1.6;
-}
-
-
-.study-result strong {
-
-    color: #a8f3ff;
-}
-
-
-/* =====================================================
-   ACTIVE STUDY SESSION
-   ===================================================== */
-
-.active-study-session {
-
-    display: none;
+.secondary-button {
 
     margin-top: 25px;
-
-    padding: 22px;
-
-    border:
-        1px solid
-        rgba(0, 220, 255, 0.22);
-
-    border-radius: 13px;
-
-    background:
-        rgba(2, 13, 21, 0.8);
 }
 
 
-.session-header {
+/* STUDY */
 
-    display: flex;
+.study-session {
 
-    justify-content: space-between;
+    margin-top: 30px;
 
-    align-items: flex-start;
+    padding-top: 20px;
 
-    gap: 15px;
+    border-top:
+        1px solid rgba(80, 210, 255, 0.2);
 }
 
+.hidden {
 
-.session-header h3 {
-
-    margin-bottom: 5px;
-
-    color: #d7f9ff;
-
-    font-size: 1.2rem;
+    display: none;
 }
 
+.timer {
 
-.session-header p {
-
-    color: #6f9ba7;
-
-    font-size: 0.8rem;
-}
-
-
-.session-status {
-
-    padding:
-        7px 11px;
-
-    border:
-        1px solid
-        rgba(63, 224, 255, 0.3);
-
-    border-radius: 20px;
-
-    color: #5fe6ff;
-
-    font-size: 0.58rem;
-
-    letter-spacing: 0.1rem;
-}
-
-
-/* =====================================================
-   TIMER
-   ===================================================== */
-
-.study-timer {
+    margin: 20px 0;
 
     text-align: center;
 
-    margin:
-        30px 0;
+    font-size: 45px;
+
+    letter-spacing: 5px;
 }
 
-
-.timer-display {
-
-    font-size:
-        clamp(
-            3rem,
-            10vw,
-            5rem
-        );
-
-    font-weight: 300;
-
-    letter-spacing: 0.12rem;
-
-    color: #8ef0ff;
-
-    text-shadow:
-        0 0 25px
-        rgba(0, 220, 255, 0.3);
-}
-
-
-.timer-label {
-
-    margin-top: 5px;
-
-    font-size: 0.6rem;
-
-    letter-spacing: 0.2rem;
-
-    color: #5d8792;
-}
-
-
-/* =====================================================
-   PROGRESS
-   ===================================================== */
-
-.progress-section {
-
-    margin-bottom: 25px;
-}
-
-
-.progress-info {
-
-    display: flex;
-
-    justify-content: space-between;
-
-    margin-bottom: 8px;
-
-    color: #648d99;
-
-    font-size: 0.6rem;
-
-    letter-spacing: 0.08rem;
-}
-
-
-.progress-bar {
+.progress-container {
 
     width: 100%;
 
     height: 8px;
 
-    border-radius: 20px;
-
     background:
-        rgba(255,255,255,0.05);
-
-    overflow: hidden;
+        rgba(255, 255, 255, 0.08);
 }
-
 
 .progress-fill {
 
@@ -1319,738 +648,217 @@ button:active {
 
     height: 100%;
 
-    border-radius: inherit;
-
     background:
-        linear-gradient(
-            90deg,
-            #0c6f85,
-            #56e6ff
-        );
-
-    box-shadow:
-        0 0 15px
-        rgba(0, 220, 255, 0.4);
+        #64dcff;
 
     transition:
-        width 0.4s ease;
+        width 0.5s;
 }
 
+#progressText {
 
-/* =====================================================
-   CURRENT TASK
-   ===================================================== */
+    text-align: center;
+
+    margin-top: 8px;
+
+    font-size: 11px;
+}
 
 .current-task {
 
-    padding:
-        17px;
+    margin-top: 25px;
 
-    border-left:
-        2px solid
-        #37dfff;
+    padding: 15px;
 
-    background:
-        rgba(0, 190, 255, 0.035);
-
-    border-radius:
-        0 8px 8px 0;
-
-    color: #b8e9f0;
-
-    line-height: 1.5;
-
-    font-size: 0.85rem;
-
-    margin-bottom: 20px;
+    border:
+        1px solid rgba(80, 210, 255, 0.2);
 }
 
+.current-task span {
 
-/* =====================================================
-   SESSION CONTROLS
-   ===================================================== */
+    display: block;
+
+    font-size: 9px;
+
+    opacity: 0.5;
+}
+
+.current-task strong {
+
+    display: block;
+
+    margin-top: 7px;
+}
 
 .session-controls {
 
     display: grid;
 
     grid-template-columns:
-        repeat(
-            4,
-            1fr
-        );
+        repeat(4, 1fr);
 
     gap: 8px;
-}
 
+    margin-top: 15px;
+}
 
 .session-controls button {
 
-    padding:
-        11px 5px;
+    padding: 10px;
 
-    font-size: 0.62rem;
+    font-size: 10px;
 }
 
 
-/* =====================================================
-   HOMEWORK MANAGER
-   ===================================================== */
+/* HOMEWORK */
 
-.homework-manager-box {
+.homework-list,
+.schedule-list,
+.test-list {
 
-    width: min(
-        850px,
-        100%
-    );
+    margin-top: 25px;
+}
 
-    max-height: 92vh;
+.homework-item,
+.schedule-item,
+.test-item {
 
-    overflow-y: auto;
+    padding: 15px;
 
-    padding: 32px;
-
-    border:
-        1px solid
-        rgba(0, 220, 255, 0.3);
-
-    border-radius: 18px;
+    margin-bottom: 10px;
 
     background:
-        linear-gradient(
-            145deg,
-            #091c2a,
-            #030b12
-        );
-
-    box-shadow:
-        0 0 60px
-        rgba(0, 190, 255, 0.13);
-}
-
-
-/* =====================================================
-   HOMEWORK ADD SECTION
-   ===================================================== */
-
-.homework-add-section {
-
-    padding:
-        20px;
+        rgba(0, 25, 35, 0.7);
 
     border:
-        1px solid
-        rgba(0, 220, 255, 0.12);
-
-    border-radius: 12px;
-
-    background:
-        rgba(0, 10, 18, 0.5);
+        1px solid rgba(80, 210, 255, 0.2);
 }
 
-
-.homework-row {
-
-    display: grid;
-
-    grid-template-columns:
-        1fr 1fr;
-
-    gap: 15px;
-}
-
-
-/* =====================================================
-   HOMEWORK LIST
-   ===================================================== */
-
-.homework-list-section {
-
-    margin-top: 28px;
-}
-
-
-.homework-list-header {
+.item-header {
 
     display: flex;
-
-    align-items: center;
 
     justify-content: space-between;
-
-    gap: 15px;
-
-    margin-bottom: 12px;
-}
-
-
-.small-action-button {
-
-    padding:
-        7px 10px;
-
-    font-size: 0.55rem;
-}
-
-
-.homework-list {
-
-    display: flex;
-
-    flex-direction: column;
 
     gap: 10px;
 }
 
+.item-title {
 
-.empty-homework {
-
-    padding:
-        30px;
-
-    text-align: center;
-
-    color: #557b86;
-
-    border:
-        1px dashed
-        rgba(0, 210, 255, 0.14);
-
-    border-radius: 10px;
-
-    font-size: 0.8rem;
+    font-weight: bold;
 }
 
+.item-meta {
 
-/* =====================================================
-   HOMEWORK ITEM
-   ===================================================== */
+    margin-top: 6px;
 
-.homework-item {
+    font-size: 11px;
+
+    opacity: 0.65;
+}
+
+.item-actions {
 
     display: flex;
 
-    align-items: center;
+    gap: 6px;
 
-    justify-content: space-between;
-
-    gap: 15px;
-
-    padding:
-        15px;
-
-    border:
-        1px solid
-        rgba(0, 210, 255, 0.12);
-
-    border-radius: 10px;
-
-    background:
-        rgba(3, 15, 24, 0.7);
-
-    transition:
-        0.2s;
+    margin-top: 12px;
 }
 
+.item-actions button {
 
-.homework-item:hover {
+    padding: 6px 10px;
 
-    border-color:
-        rgba(0, 220, 255, 0.28);
-
+    font-size: 9px;
 }
 
+.completed {
 
-.homework-item.completed {
-
-    opacity: 0.5;
-}
-
-
-.homework-item.completed
-.homework-item-info strong {
+    opacity: 0.45;
 
     text-decoration:
         line-through;
 }
 
 
-.homework-item-main {
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 13px;
-
-    min-width: 0;
-}
-
-
-/* =====================================================
-   HOMEWORK CHECKBOX
-   ===================================================== */
-
-.homework-check {
-
-    position: relative;
-
-    width: 20px;
-
-    height: 20px;
-
-    flex-shrink: 0;
-}
-
-
-.homework-check input {
-
-    position: absolute;
-
-    opacity: 0;
-
-    cursor: pointer;
-}
-
-
-.homework-check span {
-
-    position: absolute;
-
-    inset: 0;
-
-    border:
-        1px solid
-        rgba(65, 220, 245, 0.45);
-
-    border-radius: 5px;
-
-    cursor: pointer;
-}
-
-
-.homework-check input:checked
-+ span {
-
-    background:
-        rgba(37, 198, 224, 0.75);
-
-    box-shadow:
-        0 0 12px
-        rgba(0, 220, 255, 0.3);
-}
-
-
-.homework-check input:checked
-+ span::after {
-
-    content: "✓";
-
-    position: absolute;
-
-    left: 3px;
-
-    top: -1px;
-
-    color: white;
-
-    font-size: 14px;
-}
-
-
-/* =====================================================
-   HOMEWORK INFO
-   ===================================================== */
-
-.homework-item-info {
-
-    display: flex;
-
-    flex-direction: column;
-
-    gap: 4px;
-
-    min-width: 0;
-}
-
-
-.homework-item-info strong {
-
-    color: #c9f4fa;
-
-    font-size: 0.85rem;
-
-    overflow-wrap: anywhere;
-}
-
-
-.homework-item-info span {
-
-    color: #638d98;
-
-    font-size: 0.65rem;
-}
-
-
-/* =====================================================
-   HOMEWORK SIDE
-   ===================================================== */
-
-.homework-item-side {
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 10px;
-
-    flex-shrink: 0;
-}
-
-
-.homework-priority {
-
-    padding:
-        5px 8px;
-
-    border-radius: 20px;
-
-    font-size: 0.55rem;
-
-    letter-spacing: 0.06rem;
-
-    border:
-        1px solid
-        rgba(255,255,255,0.1);
-}
-
-
-.homework-priority.low {
-
-    color: #78d9c5;
-
-    background:
-        rgba(30, 150, 130, 0.08);
-}
-
-
-.homework-priority.medium {
-
-    color: #d8d077;
-
-    background:
-        rgba(180, 165, 50, 0.08);
-}
-
-
-.homework-priority.high {
-
-    color: #ff8c8c;
-
-    background:
-        rgba(210, 50, 50, 0.08);
-}
-
-
-.delete-homework {
-
-    width: 28px;
-
-    height: 28px;
-
-    padding: 0;
-
-    font-size: 1rem;
-
-    color: #7897a0;
-}
-
-
-.delete-homework:hover {
-
-    color: #ff8b8b;
-
-    border-color:
-        rgba(255, 100, 100, 0.4);
-}
-
-
-/* =====================================================
-   FOOTER
-   ===================================================== */
+/* FOOTER */
 
 footer {
 
-    padding:
-        25px;
-
     text-align: center;
 
-    color: #456873;
+    padding: 25px;
 
-    font-size: 0.58rem;
+    font-size: 9px;
 
-    letter-spacing: 0.16rem;
+    letter-spacing: 3px;
 
-    border-top:
-        1px solid
-        rgba(0, 210, 255, 0.1);
+    opacity: 0.35;
 }
 
 
-footer span {
+/* MOBILE */
 
-    color: #2e7d8e;
-
-    margin:
-        0 8px;
-}
-
-
-/* =====================================================
-   SCROLLBARS
-   ===================================================== */
-
-::-webkit-scrollbar {
-
-    width: 7px;
-
-}
-
-
-::-webkit-scrollbar-track {
-
-    background:
-        #02080d;
-
-}
-
-
-::-webkit-scrollbar-thumb {
-
-    background:
-        #174857;
-
-    border-radius:
-        10px;
-
-}
-
-
-::-webkit-scrollbar-thumb:hover {
-
-    background:
-        #246b7d;
-
-}
-
-
-/* =====================================================
-   RESPONSIVE DESIGN
-   ===================================================== */
-
-@media (
-    max-width: 900px
-) {
-
-    .dashboard {
-
-        grid-template-columns:
-            repeat(
-                2,
-                1fr
-            );
-
-    }
-
-}
-
-
-@media (
-    max-width: 650px
-) {
+@media (max-width: 700px) {
 
     header {
 
-        padding:
-            18px 5%;
+        padding: 20px;
 
         flex-direction: column;
 
-        align-items: flex-start;
+        gap: 15px;
 
-        gap: 12px;
-
+        text-align: center;
     }
-
-
-    .logo {
-
-        font-size: 1.45rem;
-
-    }
-
-
-    main {
-
-        width: 94%;
-
-        margin-top: 25px;
-
-    }
-
-
-    .main-panel {
-
-        padding:
-            32px 18px;
-
-    }
-
-
-    .core {
-
-        transform:
-            scale(0.82);
-
-        margin-top: 5px;
-
-        margin-bottom: 10px;
-
-    }
-
-
-    .command-area {
-
-        flex-direction: column;
-
-    }
-
-
-    .command-area input {
-
-        width: 100%;
-
-    }
-
-
-    .send-button {
-
-        width: 100%;
-
-    }
-
 
     .dashboard {
 
-        grid-template-columns:
-            1fr;
-
+        grid-template-columns: 1fr;
     }
 
+    .command-box {
 
-    .study-hub,
-    .homework-manager {
-
-        padding:
-            15px;
-
+        flex-direction: column;
     }
 
+    .command-box button {
 
-    .study-hub-box,
-    .homework-manager-box {
-
-        padding:
-            22px;
-
+        padding: 13px;
     }
 
+    .system-info {
 
-    .homework-row {
-
-        grid-template-columns:
-            1fr;
-
-        gap: 0;
-
+        grid-template-columns: 1fr;
     }
-
 
     .session-controls {
 
         grid-template-columns:
-            repeat(
-                2,
-                1fr
-            );
-
+            repeat(2, 1fr);
     }
 
+    .modal-content {
 
-    .homework-item {
-
-        align-items:
-            flex-start;
-
-    }
-
-
-    .homework-item-side {
-
-        flex-direction:
-            column;
-
-        align-items:
-            flex-end;
-
-    }
-
-
-    footer {
-
-        line-height: 1.8;
-
+        padding: 22px;
     }
 
 }
 
+@media (max-width: 420px) {
 
-@media (
-    max-width: 420px
-) {
+    .brand-title {
 
-    .core {
+        font-size: 22px;
 
-        transform:
-            scale(0.7);
-
-        margin:
-            -10px auto;
-
+        letter-spacing: 4px;
     }
 
+    .jarvis-core {
 
-    .timer-display {
-
-        font-size: 3rem;
-
-    }
-
-
-    .session-header {
-
-        flex-direction:
-            column;
-
-    }
-
-
-    .session-status {
-
-        align-self:
-            flex-start;
-
+        width: 190px;
+        height: 190px;
     }
 
 }
