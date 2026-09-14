@@ -1,43 +1,134 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-    <title>JARVIS</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>J.A.R.V.I.S.</title>
+
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-    <div class="jarvis">
-        <h1>J.A.R.V.I.S.</h1>
-        <p>JUST A RATHER VERY INTELLIGENT SYSTEM</p>
+    <div class="background-grid"></div>
 
-        <div class="status">
-            SYSTEM ONLINE
+    <header>
+        <div class="logo">
+            J.A.R.V.I.S.
         </div>
 
-        <div class="core">
-            ◉
+        <div class="system-status">
+            ● SYSTEM ONLINE
         </div>
+    </header>
 
-        <p class="command-status">
-            Ready for command.
-        </p>
 
-        <input
-            id="commandInput"
-            type="text"
-            placeholder="Give JARVIS a command..."
-        >
+    <main>
 
-        <button onclick="sendCommand()">
-            SEND COMMAND
-        </button>
+        <section class="main-panel">
 
-        <div id="response">
-        </div>
-    </div>
+            <div class="small-text">
+                JUST A RATHER VERY INTELLIGENT SYSTEM
+            </div>
+
+            <div class="core">
+
+                <div class="core-ring ring-one"></div>
+                <div class="core-ring ring-two"></div>
+                <div class="core-ring ring-three"></div>
+
+                <div class="core-center">
+                    J
+                </div>
+
+            </div>
+
+            <div class="ready">
+                READY FOR COMMAND
+            </div>
+
+
+            <div class="command-area">
+
+                <input
+                    id="commandInput"
+                    type="text"
+                    placeholder="Give JARVIS a command..."
+                >
+
+                <button onclick="sendCommand()">
+                    SEND
+                </button>
+
+                <button onclick="startListening()" class="voice-button">
+                    🎙
+                </button>
+
+            </div>
+
+
+            <div id="response">
+                Awaiting your command...
+            </div>
+
+        </section>
+
+
+        <section class="dashboard">
+
+            <div class="panel">
+                <h2>SCHEDULE</h2>
+                <p>No schedule loaded.</p>
+
+                <button onclick="openSchedule()">
+                    OPEN CALENDAR
+                </button>
+            </div>
+
+
+            <div class="panel">
+                <h2>STUDY</h2>
+                <p>Ready to assist with your studies.</p>
+
+                <button onclick="startStudy()">
+                    STUDY HUB
+                </button>
+            </div>
+
+
+            <div class="panel">
+                <h2>HOMEWORK</h2>
+                <p>No tasks loaded.</p>
+
+                <button>
+                    VIEW HOMEWORK
+                </button>
+            </div>
+
+
+            <div class="panel">
+                <h2>TESTS & EXAMS</h2>
+                <p>No tests loaded.</p>
+
+                <button>
+                    VIEW TESTS
+                </button>
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <footer>
+        JARVIS STUDENT ASSISTANT • PROTOTYPE 4
+    </footer>
+
 
     <script src="script.js"></script>
 
 </body>
+
 </html>
