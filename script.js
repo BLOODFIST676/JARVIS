@@ -1,13 +1,83 @@
-// =========================
-// JARVIS CONVERSATION MEMORY
-// =========================
+// =====================================================
+// JARVIS - MAIN SCRIPT
+// AI CONVERSATION + PERSISTENT MEMORY + VOICE
+// =====================================================
+
+
+// =====================================================
+// CONVERSATION MEMORY
+// =====================================================
 
 let conversationHistory = [];
 
 
-// =========================
+// =====================================================
+// PERSISTENT JARVIS MEMORY
+// =====================================================
+
+let jarvisMemory =
+    JSON.parse(
+        localStorage.getItem("jarvisMemory") || "[]"
+    );
+
+
+// Save memory to the browser
+function saveMemory() {
+
+    localStorage.setItem(
+        "jarvisMemory",
+        JSON.stringify(jarvisMemory)
+    );
+
+}
+
+
+// Add something to JARVIS memory
+function addMemory(memory) {
+
+    if (!memory || memory.trim() === "") {
+        return;
+    }
+
+    jarvisMemory.push(memory.trim());
+
+    saveMemory();
+
+}
+
+
+// Clear all saved memory
+function clearMemory() {
+
+    jarvisMemory = [];
+
+    saveMemory();
+
+}
+
+
+// Get saved memory
+function getMemoryText() {
+
+    if (jarvisMemory.length === 0) {
+
+        return "No personal memories have been saved yet.";
+
+    }
+
+    return jarvisMemory
+        .map(
+            (memory, index) =>
+                `${index + 1}. ${memory}`
+        )
+        .join("\n");
+
+}
+
+
+// =====================================================
 // SEND COMMAND
-// =========================
+// =====================================================
 
 function sendCommand() {
 
@@ -24,6 +94,7 @@ function sendCommand() {
         document.getElementById("response");
 
 
+    // Empty command
     if (command === "") {
 
         response.innerText =
@@ -35,9 +106,91 @@ function sendCommand() {
     }
 
 
-    // =========================
+    // =================================================
+    // REMEMBER SOMETHING
+    // =================================================
+
+    if (
+        lowerCommand.startsWith("remember that ") ||
+        lowerCommand.startsWith("remember ")
+    ) {
+
+        let memory = command
+            .replace(/^remember that /i, "")
+            .replace(/^remember /i, "")
+            .trim();
+
+
+        if (memory !== "") {
+
+            addMemory(memory);
+
+            response.innerText =
+                "JARVIS: I'll remember that.";
+
+            speak(response.innerText);
+
+            input.value = "";
+
+            return;
+        }
+    }
+
+
+    // =================================================
+    // FORGET EVERYTHING
+    // =================================================
+
+    if (
+        lowerCommand.includes("forget everything") ||
+        lowerCommand.includes("clear my memory") ||
+        lowerCommand.includes("erase my memory")
+    ) {
+
+        clearMemory();
+
+        response.innerText =
+            "JARVIS: I've cleared my saved memory.";
+
+        speak(response.innerText);
+
+        input.value = "";
+
+        return;
+    }
+
+
+    // =================================================
+    // SHOW MEMORY
+    // =================================================
+
+    if (
+        lowerCommand.includes("what do you remember") ||
+        lowerCommand.includes("show my memory") ||
+        lowerCommand.includes("what do you know about me")
+    ) {
+
+        const memoryText =
+            getMemoryText();
+
+        response.innerText =
+            "JARVIS: Here is what I remember:\n\n" +
+            memoryText;
+
+        speak(
+            "Here is what I remember. " +
+            memoryText
+        );
+
+        input.value = "";
+
+        return;
+    }
+
+
+    // =================================================
     // SCHEDULE
-    // =========================
+    // =================================================
 
     if (
         lowerCommand.includes("schedule") ||
@@ -57,9 +210,9 @@ function sendCommand() {
     }
 
 
-    // =========================
+    // =================================================
     // STUDY
-    // =========================
+    // =================================================
 
     if (
         lowerCommand.includes("study") ||
@@ -81,9 +234,9 @@ function sendCommand() {
     }
 
 
-    // =========================
+    // =================================================
     // DOCUMENTS
-    // =========================
+    // =================================================
 
     if (
         lowerCommand.includes("notes") ||
@@ -103,9 +256,9 @@ function sendCommand() {
     }
 
 
-    // =========================
+    // =================================================
     // HOMEWORK
-    // =========================
+    // =================================================
 
     if (
         lowerCommand.includes("homework") ||
@@ -124,9 +277,9 @@ function sendCommand() {
     }
 
 
-    // =========================
+    // =================================================
     // TESTS / EXAMS
-    // =========================
+    // =================================================
 
     if (
         lowerCommand.includes("test") ||
@@ -146,19 +299,20 @@ function sendCommand() {
     }
 
 
-    // =========================
+    // =================================================
     // AI CONVERSATION
-    // =========================
+    // =================================================
 
     askJARVIS(command);
 
     input.value = "";
+
 }
 
 
-// =========================
+// =====================================================
 // ASK JARVIS AI
-// =========================
+// =====================================================
 
 async function askJARVIS(message) {
 
@@ -175,6 +329,7 @@ async function askJARVIS(message) {
         const result = await fetch(
             "https://jarvis-ai.tvisha-sanish.workers.dev/",
             {
+
                 method: "POST",
 
                 headers: {
@@ -182,9 +337,17 @@ async function askJARVIS(message) {
                 },
 
                 body: JSON.stringify({
+
                     message: message,
-                    history: conversationHistory
+
+                    history:
+                        conversationHistory,
+
+                    memory:
+                        jarvisMemory
+
                 })
+
             }
         );
 
@@ -193,37 +356,67 @@ async function askJARVIS(message) {
             await result.json();
 
 
+        // =================================================
+        // CHECK FOR ERROR
+        // =================================================
+
         if (!result.ok) {
 
             throw new Error(
                 data.error || "Request failed"
             );
+
         }
 
 
-        // =========================
+        // =================================================
         // SAVE CONVERSATION
-        // =========================
+        // =================================================
 
         conversationHistory.push({
+
             role: "user",
+
             content: message
+
         });
 
 
         conversationHistory.push({
+
             role: "assistant",
+
             content: data.response
+
         });
 
 
-        // =========================
+        // =================================================
+        // LIMIT CONVERSATION MEMORY
+        // =================================================
+
+        // Keep the most recent 20 messages
+        // so the request does not become unnecessarily large.
+
+        if (conversationHistory.length > 20) {
+
+            conversationHistory =
+                conversationHistory.slice(-20);
+
+        }
+
+
+        // =================================================
         // DISPLAY RESPONSE
-        // =========================
+        // =================================================
 
         response.innerText =
             "JARVIS: " + data.response;
 
+
+        // =================================================
+        // SPEAK RESPONSE
+        // =================================================
 
         speak(response.innerText);
 
@@ -243,12 +436,13 @@ async function askJARVIS(message) {
         speak(response.innerText);
 
     }
+
 }
 
 
-// =========================
+// =====================================================
 // VOICE RECOGNITION
-// =========================
+// =====================================================
 
 function startListening() {
 
@@ -259,6 +453,8 @@ function startListening() {
         document.getElementById("commandInput");
 
 
+    // Check browser support
+
     if (!("webkitSpeechRecognition" in window)) {
 
         response.innerText =
@@ -267,6 +463,7 @@ function startListening() {
         speak(response.innerText);
 
         return;
+
     }
 
 
@@ -277,8 +474,10 @@ function startListening() {
     recognition.lang =
         "en-SG";
 
+
     recognition.continuous =
         false;
+
 
     recognition.interimResults =
         false;
@@ -290,6 +489,10 @@ function startListening() {
 
     recognition.start();
 
+
+    // =================================================
+    // VOICE RESULT
+    // =================================================
 
     recognition.onresult =
         function(event) {
@@ -307,8 +510,13 @@ function startListening() {
 
 
             sendCommand();
+
         };
 
+
+    // =================================================
+    // VOICE ERROR
+    // =================================================
 
     recognition.onerror =
         function() {
@@ -320,6 +528,10 @@ function startListening() {
 
         };
 
+
+    // =================================================
+    // VOICE END
+    // =================================================
 
     recognition.onend =
         function() {
@@ -333,9 +545,9 @@ function startListening() {
 }
 
 
-// =========================
+// =====================================================
 // SCHEDULE BUTTON
-// =========================
+// =====================================================
 
 function openSchedule() {
 
@@ -352,9 +564,9 @@ function openSchedule() {
 }
 
 
-// =========================
+// =====================================================
 // STUDY BUTTON
-// =========================
+// =====================================================
 
 function startStudy() {
 
@@ -371,11 +583,20 @@ function startStudy() {
 }
 
 
-// =========================
+// =====================================================
 // TEXT TO SPEECH
-// =========================
+// =====================================================
 
 function speak(text) {
+
+    if (
+        !("speechSynthesis" in window)
+    ) {
+
+        return;
+
+    }
+
 
     const speech =
         new SpeechSynthesisUtterance(text);
@@ -384,14 +605,17 @@ function speak(text) {
     speech.rate =
         1;
 
+
     speech.pitch =
         1;
+
 
     speech.volume =
         1;
 
 
     window.speechSynthesis.cancel();
+
 
     window.speechSynthesis.speak(
         speech
