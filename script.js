@@ -7,6 +7,7 @@ function sendCommand() {
 
     if (command === "") {
         response.innerText = "JARVIS: Please give me a command.";
+        speak(response.innerText);
         return;
     }
 
@@ -22,6 +23,8 @@ function sendCommand() {
         response.innerText =
             "JARVIS: Accessing your schedule. Google Calendar integration is not connected yet.";
 
+        speak(response.innerText);
+        input.value = "";
         return;
     }
 
@@ -39,6 +42,8 @@ function sendCommand() {
         response.innerText =
             "JARVIS: Study mode detected. I can help you plan your revision once your study data is connected.";
 
+        speak(response.innerText);
+        input.value = "";
         return;
     }
 
@@ -54,6 +59,8 @@ function sendCommand() {
         response.innerText =
             "JARVIS: Document search detected. Google Drive integration will be connected later.";
 
+        speak(response.innerText);
+        input.value = "";
         return;
     }
 
@@ -68,6 +75,8 @@ function sendCommand() {
         response.innerText =
             "JARVIS: Homework system detected. Your task database has not been connected yet.";
 
+        speak(response.innerText);
+        input.value = "";
         return;
     }
 
@@ -83,6 +92,8 @@ function sendCommand() {
         response.innerText =
             "JARVIS: Test and examination system detected. I will need your test data to provide your schedule.";
 
+        speak(response.innerText);
+        input.value = "";
         return;
     }
 
@@ -91,10 +102,15 @@ function sendCommand() {
     response.innerText =
         "JARVIS: I understood your command, but I don't have the required system connected yet.";
 
+    speak(response.innerText);
 
     input.value = "";
 }
 
+
+// ================================
+// VOICE RECOGNITION
+// ================================
 
 function startListening() {
 
@@ -106,6 +122,7 @@ function startListening() {
         response.innerText =
             "JARVIS: Voice recognition is not supported by this browser.";
 
+        speak(response.innerText);
         return;
     }
 
@@ -117,6 +134,8 @@ function startListening() {
 
     response.innerText =
         "JARVIS: Listening...";
+
+    speak("JARVIS: Listening...");
 
     recognition.start();
 
@@ -140,6 +159,8 @@ function startListening() {
         response.innerText =
             "JARVIS: I couldn't hear that. Please try again.";
 
+        speak(response.innerText);
+
     };
 
 
@@ -151,6 +172,29 @@ function startListening() {
 
 }
 
+
+// ================================
+// TEXT TO SPEECH
+// ================================
+
+function speak(text) {
+
+    const speech = new SpeechSynthesisUtterance(text);
+
+    speech.rate = 1;
+    speech.pitch = 1;
+    speech.volume = 1;
+
+    window.speechSynthesis.cancel();
+
+    window.speechSynthesis.speak(speech);
+}
+
+
+// ================================
+// SCHEDULE
+// ================================
+
 function openSchedule() {
 
     const response = document.getElementById("response");
@@ -158,8 +202,13 @@ function openSchedule() {
     response.innerText =
         "JARVIS: Calendar system detected. Google Calendar integration is coming next.";
 
+    speak(response.innerText);
 }
 
+
+// ================================
+// STUDY HUB
+// ================================
 
 function startStudy() {
 
@@ -168,4 +217,6 @@ function startStudy() {
     response.innerText =
         "JARVIS: Study Hub activated.";
 
+    speak(response.innerText);
 }
+```
