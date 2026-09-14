@@ -2,119 +2,416 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>J.A.R.V.I.S.</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-    <link rel="stylesheet" href="style.css">
+    <title>J.A.R.V.I.S. — Student Assistant</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
 </head>
+
 
 <body>
 
+    <!-- ========================================= -->
+    <!-- BACKGROUND -->
+    <!-- ========================================= -->
+
     <div class="background-grid"></div>
 
+    <div class="scan-line"></div>
+
+
+    <!-- ========================================= -->
+    <!-- HEADER -->
+    <!-- ========================================= -->
+
     <header>
+
         <div class="logo">
+
             J.A.R.V.I.S.
+
+            <span class="subtitle">
+                PERSONAL AI SYSTEM
+            </span>
+
         </div>
 
+
         <div class="system-status">
-            ● SYSTEM ONLINE
+
+            <span class="status-dot">
+                ●
+            </span>
+
+            SYSTEM ONLINE
+
         </div>
+
     </header>
 
 
+    <!-- ========================================= -->
+    <!-- MAIN -->
+    <!-- ========================================= -->
+
     <main>
+
+
+        <!-- ===================================== -->
+        <!-- CENTRAL JARVIS CORE -->
+        <!-- ===================================== -->
 
         <section class="main-panel">
 
             <div class="small-text">
+
                 JUST A RATHER VERY INTELLIGENT SYSTEM
+
             </div>
+
+
+            <!-- JARVIS CORE -->
 
             <div class="core">
 
                 <div class="core-ring ring-one"></div>
+
                 <div class="core-ring ring-two"></div>
+
                 <div class="core-ring ring-three"></div>
 
+                <div class="core-ring ring-four"></div>
+
+
                 <div class="core-center">
-                    J
+
+                    <span>
+                        J
+                    </span>
+
                 </div>
 
             </div>
 
+
+            <!-- STATUS -->
+
             <div class="ready">
+
+                <span class="status-indicator">
+                    ●
+                </span>
+
                 READY FOR COMMAND
+
             </div>
 
+
+            <!-- COMMAND BOX -->
 
             <div class="command-area">
 
                 <input
                     id="commandInput"
                     type="text"
-                    placeholder="Give JARVIS a command..."
+                    placeholder="Ask JARVIS anything..."
+                    autocomplete="off"
                 >
 
-                <button onclick="sendCommand()">
+
+                <button
+                    onclick="sendCommand()"
+                    class="send-button"
+                >
+
                     SEND
+
                 </button>
 
-                <button onclick="startListening()" class="voice-button">
+
+                <button
+                    onclick="startListening()"
+                    class="voice-button"
+                    title="Voice command"
+                >
+
                     🎙
+
                 </button>
 
             </div>
 
 
-            <div id="response">
-                Awaiting your command...
+            <!-- RESPONSE -->
+
+            <div
+                id="response"
+                class="response-box"
+            >
+
+                <span class="response-label">
+                    JARVIS
+                </span>
+
+                <span class="response-text">
+                    Awaiting your command...
+                </span>
+
             </div>
 
         </section>
 
 
+
+        <!-- ===================================== -->
+        <!-- DASHBOARD -->
+        <!-- ===================================== -->
+
         <section class="dashboard">
 
-            <div class="panel">
-                <h2>SCHEDULE</h2>
-                <p>No schedule loaded.</p>
 
-                <button onclick="openSchedule()">
+            <!-- ================================= -->
+            <!-- SYSTEM -->
+            <!-- ================================= -->
+
+            <div class="panel system-panel">
+
+                <div class="panel-header">
+
+                    <span class="panel-icon">
+                        ◉
+                    </span>
+
+                    <h2>
+                        SYSTEM
+                    </h2>
+
+                </div>
+
+
+                <div class="system-data">
+
+                    <div>
+                        <span>
+                            AI CORE
+                        </span>
+
+                        <strong>
+                            ONLINE
+                        </strong>
+                    </div>
+
+
+                    <div>
+                        <span>
+                            MEMORY
+                        </span>
+
+                        <strong>
+                            ACTIVE
+                        </strong>
+                    </div>
+
+
+                    <div>
+                        <span>
+                            VOICE
+                        </span>
+
+                        <strong>
+                            READY
+                        </strong>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- ================================= -->
+            <!-- SCHEDULE -->
+            <!-- ================================= -->
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <span class="panel-icon">
+                        ◷
+                    </span>
+
+                    <h2>
+                        SCHEDULE
+                    </h2>
+
+                </div>
+
+
+                <p>
+                    No schedule loaded.
+                </p>
+
+
+                <button
+                    onclick="openSchedule()"
+                >
+
                     OPEN CALENDAR
+
                 </button>
+
             </div>
 
 
-            <div class="panel">
-                <h2>STUDY</h2>
-                <p>Ready to assist with your studies.</p>
 
-                <button onclick="startStudy()">
-                    STUDY HUB
+            <!-- ================================= -->
+            <!-- STUDY -->
+            <!-- ================================= -->
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <span class="panel-icon">
+                        ▣
+                    </span>
+
+                    <h2>
+                        STUDY HUB
+                    </h2>
+
+                </div>
+
+
+                <p>
+                    Ready to assist with your studies.
+                </p>
+
+
+                <button
+                    onclick="startStudy()"
+                >
+
+                    START STUDY MODE
+
                 </button>
+
             </div>
 
 
+
+            <!-- ================================= -->
+            <!-- HOMEWORK -->
+            <!-- ================================= -->
+
             <div class="panel">
-                <h2>HOMEWORK</h2>
-                <p>No tasks loaded.</p>
+
+                <div class="panel-header">
+
+                    <span class="panel-icon">
+                        ✓
+                    </span>
+
+                    <h2>
+                        HOMEWORK
+                    </h2>
+
+                </div>
+
+
+                <p>
+                    No tasks loaded.
+                </p>
+
 
                 <button>
+
                     VIEW HOMEWORK
+
                 </button>
+
             </div>
 
 
+
+            <!-- ================================= -->
+            <!-- TESTS -->
+            <!-- ================================= -->
+
             <div class="panel">
-                <h2>TESTS & EXAMS</h2>
-                <p>No tests loaded.</p>
+
+                <div class="panel-header">
+
+                    <span class="panel-icon">
+                        !
+                    </span>
+
+                    <h2>
+                        TESTS & EXAMS
+                    </h2>
+
+                </div>
+
+
+                <p>
+                    No tests loaded.
+                </p>
+
 
                 <button>
+
                     VIEW TESTS
+
                 </button>
+
+            </div>
+
+
+
+            <!-- ================================= -->
+            <!-- MEMORY -->
+            <!-- ================================= -->
+
+            <div class="panel memory-panel">
+
+                <div class="panel-header">
+
+                    <span class="panel-icon">
+                        🧠
+                    </span>
+
+                    <h2>
+                        JARVIS MEMORY
+                    </h2>
+
+                </div>
+
+
+                <p>
+                    Your saved preferences and information are stored locally in your browser.
+                </p>
+
+
+                <button
+                    onclick="document.getElementById('commandInput').value='What do you remember about me?'; sendCommand();"
+                >
+
+                    VIEW MEMORY
+
+                </button>
+
             </div>
 
         </section>
@@ -122,10 +419,26 @@
     </main>
 
 
+
+    <!-- ========================================= -->
+    <!-- FOOTER -->
+    <!-- ========================================= -->
+
     <footer>
-        JARVIS STUDENT ASSISTANT • PROTOTYPE 4
+
+        J.A.R.V.I.S.
+        <span>•</span>
+        PERSONAL STUDENT ASSISTANT
+        <span>•</span>
+        PROTOTYPE 5
+
     </footer>
 
+
+
+    <!-- ========================================= -->
+    <!-- JAVASCRIPT -->
+    <!-- ========================================= -->
 
     <script src="script.js"></script>
 
