@@ -181,9 +181,7 @@
         <section class="dashboard">
 
 
-            <!-- ================================= -->
             <!-- SYSTEM -->
-            <!-- ================================= -->
 
             <div class="panel system-panel">
 
@@ -246,9 +244,7 @@
 
 
 
-            <!-- ================================= -->
             <!-- SCHEDULE -->
-            <!-- ================================= -->
 
             <div class="panel">
 
@@ -282,9 +278,7 @@
 
 
 
-            <!-- ================================= -->
             <!-- STUDY HUB -->
-            <!-- ================================= -->
 
             <div class="panel study-panel">
 
@@ -302,7 +296,7 @@
 
 
                 <p>
-                    Generate a personalised study session with JARVIS.
+                    Generate and run a personalised study session.
                 </p>
 
 
@@ -318,9 +312,7 @@
 
 
 
-            <!-- ================================= -->
             <!-- HOMEWORK -->
-            <!-- ================================= -->
 
             <div class="panel">
 
@@ -354,9 +346,7 @@
 
 
 
-            <!-- ================================= -->
             <!-- TESTS -->
-            <!-- ================================= -->
 
             <div class="panel">
 
@@ -390,9 +380,7 @@
 
 
 
-            <!-- ================================= -->
             <!-- MEMORY -->
-            <!-- ================================= -->
 
             <div class="panel memory-panel">
 
@@ -429,7 +417,7 @@
 
 
         <!-- ===================================== -->
-        <!-- STUDY HUB MODAL -->
+        <!-- STUDY HUB -->
         <!-- ===================================== -->
 
         <section
@@ -439,6 +427,8 @@
 
             <div class="study-hub-box">
 
+
+                <!-- HEADER -->
 
                 <div class="study-hub-header">
 
@@ -469,7 +459,8 @@
 
                 <p class="study-description">
 
-                    Configure your study session and let JARVIS help you get started.
+                    Configure your study session and let JARVIS
+                    build a personalised revision plan.
 
                 </p>
 
@@ -613,19 +604,20 @@
 
 
 
-                <!-- START -->
+                <!-- GENERATE -->
 
                 <button
                     onclick="generateStudySession()"
                     class="study-start-button"
                 >
 
-                    INITIALISE STUDY SESSION
+                    GENERATE STUDY SESSION
 
                 </button>
 
 
-                <!-- RESULT -->
+
+                <!-- AI RESULT -->
 
                 <div
                     id="studyResult"
@@ -639,6 +631,174 @@
                     <p>
                         Configure your session above.
                     </p>
+
+                </div>
+
+
+
+                <!-- ================================= -->
+                <!-- ACTIVE SESSION -->
+                <!-- ================================= -->
+
+                <div
+                    id="activeStudySession"
+                    class="active-study-session"
+                >
+
+
+                    <div class="session-header">
+
+                        <div>
+
+                            <div class="response-label">
+                                ACTIVE STUDY SESSION
+                            </div>
+
+                            <h3 id="sessionSubject">
+                                —
+                            </h3>
+
+                            <p id="sessionTopic">
+                                —
+                            </p>
+
+                        </div>
+
+
+                        <div
+                            id="sessionStatus"
+                            class="session-status"
+                        >
+
+                            READY
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- TIMER -->
+
+                    <div class="study-timer">
+
+                        <div
+                            id="timerDisplay"
+                            class="timer-display"
+                        >
+
+                            00:00
+
+                        </div>
+
+
+                        <div
+                            class="timer-label"
+                        >
+
+                            REMAINING
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- PROGRESS -->
+
+                    <div class="progress-section">
+
+                        <div class="progress-info">
+
+                            <span>
+                                SESSION PROGRESS
+                            </span>
+
+                            <span
+                                id="progressPercent"
+                            >
+                                0%
+                            </span>
+
+                        </div>
+
+
+                        <div class="progress-bar">
+
+                            <div
+                                id="progressFill"
+                                class="progress-fill"
+                            ></div>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- CURRENT TASK -->
+
+                    <div class="current-task">
+
+                        <div class="response-label">
+                            CURRENT TASK
+                        </div>
+
+
+                        <div
+                            id="currentTask"
+                        >
+
+                            Prepare to begin.
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- CONTROLS -->
+
+                    <div class="session-controls">
+
+                        <button
+                            onclick="startTimer()"
+                            id="startTimerButton"
+                        >
+
+                            ▶ START
+
+                        </button>
+
+
+                        <button
+                            onclick="pauseTimer()"
+                        >
+
+                            ⏸ PAUSE
+
+                        </button>
+
+
+                        <button
+                            onclick="resetTimer()"
+                        >
+
+                            ↻ RESET
+
+                        </button>
+
+
+                        <button
+                            onclick="finishStudySession()"
+                        >
+
+                            ✓ FINISH
+
+                        </button>
+
+                    </div>
+
 
                 </div>
 
@@ -664,7 +824,7 @@
 
         <span>•</span>
 
-        PROTOTYPE 6
+        PROTOTYPE 7
 
     </footer>
 
