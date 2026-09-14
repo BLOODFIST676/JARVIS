@@ -1,358 +1,1124 @@
+/* =====================================================
+   JARVIS - FUTURISTIC INTERFACE
+   ===================================================== */
+
+
+/* =====================================================
+   GLOBAL
+   ===================================================== */
+
 * {
     box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
+
+
+html,
+body {
+    width: 100%;
+    min-height: 100%;
+}
+
 
 body {
-    margin: 0;
+
+    font-family:
+        "Segoe UI",
+        Arial,
+        sans-serif;
+
+    background:
+        radial-gradient(
+            circle at center,
+            #071b2c 0%,
+            #020b14 45%,
+            #010509 100%
+        );
+
+    color: #dff7ff;
+
     min-height: 100vh;
 
-    background: #03070c;
-    color: #00d9ff;
-
-    font-family: Arial, Helvetica, sans-serif;
-
     overflow-x: hidden;
-}
-
-
-/* BACKGROUND */
-
-.background-grid {
-    position: fixed;
-    inset: 0;
-
-    background-image:
-        linear-gradient(rgba(0, 217, 255, 0.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0, 217, 255, 0.04) 1px, transparent 1px);
-
-    background-size: 40px 40px;
-
-    z-index: -1;
-}
-
-
-/* HEADER */
-
-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-
-    padding: 25px 40px;
-
-    border-bottom: 1px solid rgba(0, 217, 255, 0.25);
-}
-
-.logo {
-    font-size: 28px;
-    font-weight: bold;
-    letter-spacing: 6px;
-}
-
-.system-status {
-    font-size: 13px;
-    letter-spacing: 2px;
-}
-
-
-/* MAIN */
-
-main {
-    max-width: 1200px;
-    margin: auto;
-    padding: 50px 25px;
-}
-
-
-/* MAIN JARVIS PANEL */
-
-.main-panel {
-    text-align: center;
-}
-
-.small-text {
-    font-size: 12px;
-    letter-spacing: 4px;
-    opacity: 0.7;
-}
-
-
-/* CORE */
-
-.core {
-    width: 260px;
-    height: 260px;
-
-    margin: 45px auto;
 
     position: relative;
 
-    display: flex;
-    justify-content: center;
-    align-items: center;
 }
 
 
-.core-ring {
-    position: absolute;
+/* =====================================================
+   BACKGROUND GRID
+   ===================================================== */
 
-    border-radius: 50%;
+.background-grid {
 
-    border: 2px solid #00d9ff;
+    position: fixed;
 
-    animation: rotate 10s linear infinite;
+    inset: 0;
+
+    z-index: -3;
+
+    opacity: 0.18;
+
+    background-image:
+
+        linear-gradient(
+            rgba(0, 190, 255, 0.18) 1px,
+            transparent 1px
+        ),
+
+        linear-gradient(
+            90deg,
+            rgba(0, 190, 255, 0.18) 1px,
+            transparent 1px
+        );
+
+    background-size: 45px 45px;
+
+    mask-image:
+        radial-gradient(
+            circle at center,
+            black 20%,
+            transparent 90%
+        );
+
 }
 
-.ring-one {
-    width: 250px;
-    height: 250px;
-}
 
-.ring-two {
-    width: 200px;
-    height: 200px;
+/* =====================================================
+   SCAN LINE
+   ===================================================== */
 
-    border-style: dashed;
+.scan-line {
 
-    animation-direction: reverse;
-    animation-duration: 7s;
-}
+    position: fixed;
 
-.ring-three {
-    width: 145px;
-    height: 145px;
+    top: -10%;
 
-    animation-duration: 4s;
-}
+    left: 0;
 
+    width: 100%;
 
-.core-center {
-    width: 90px;
-    height: 90px;
+    height: 2px;
 
-    border-radius: 50%;
-
-    border: 3px solid #00d9ff;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    font-size: 45px;
-    font-weight: bold;
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(0, 220, 255, 0.7),
+            transparent
+        );
 
     box-shadow:
-        0 0 15px #00d9ff,
-        0 0 50px rgba(0, 217, 255, 0.4);
+        0 0 15px rgba(0, 220, 255, 0.8);
 
-    animation: pulse 2s infinite;
+    opacity: 0.25;
+
+    z-index: 20;
+
+    animation:
+        scan 8s linear infinite;
+
 }
 
 
-@keyframes rotate {
-    from {
-        transform: rotate(0deg);
+@keyframes scan {
+
+    0% {
+        top: -10%;
     }
 
-    to {
-        transform: rotate(360deg);
+    100% {
+        top: 110%;
     }
+
+}
+
+
+/* =====================================================
+   HEADER
+   ===================================================== */
+
+header {
+
+    width: 100%;
+
+    padding:
+        25px 40px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    border-bottom:
+        1px solid rgba(0, 200, 255, 0.18);
+
+    background:
+        rgba(1, 9, 16, 0.65);
+
+    backdrop-filter:
+        blur(10px);
+
+}
+
+
+.logo {
+
+    font-size: 26px;
+
+    font-weight: 700;
+
+    letter-spacing: 5px;
+
+    color: #e7fbff;
+
+    text-shadow:
+        0 0 10px rgba(0, 210, 255, 0.7);
+
+}
+
+
+.logo .subtitle {
+
+    display: block;
+
+    font-size: 9px;
+
+    letter-spacing: 3px;
+
+    margin-top: 5px;
+
+    color: #5ba9c2;
+
+    font-weight: 400;
+
+}
+
+
+.system-status {
+
+    font-size: 12px;
+
+    letter-spacing: 2px;
+
+    color: #66ffcc;
+
+}
+
+
+.status-dot {
+
+    text-shadow:
+        0 0 8px #66ffcc;
+
+    animation:
+        pulse 1.5s infinite;
+
 }
 
 
 @keyframes pulse {
-    0% {
-        transform: scale(1);
+
+    0%,
+    100% {
+        opacity: 1;
     }
 
     50% {
-        transform: scale(1.08);
+        opacity: 0.35;
     }
 
-    100% {
-        transform: scale(1);
-    }
 }
 
 
-/* READY */
+/* =====================================================
+   MAIN LAYOUT
+   ===================================================== */
+
+main {
+
+    width: min(
+        1400px,
+        94%
+    );
+
+    margin:
+        35px auto 0;
+
+}
+
+
+/* =====================================================
+   MAIN JARVIS PANEL
+   ===================================================== */
+
+.main-panel {
+
+    text-align: center;
+
+    padding:
+        20px 20px 40px;
+
+}
+
+
+.small-text {
+
+    font-size: 11px;
+
+    letter-spacing: 4px;
+
+    color: #4c9bb7;
+
+    margin-bottom: 20px;
+
+}
+
+
+/* =====================================================
+   JARVIS CORE
+   ===================================================== */
+
+.core {
+
+    width: 270px;
+
+    height: 270px;
+
+    margin:
+        10px auto 30px;
+
+    position: relative;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+}
+
+
+/* Core glow */
+
+.core::before {
+
+    content: "";
+
+    position: absolute;
+
+    width: 100px;
+
+    height: 100px;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(80, 230, 255, 0.8),
+            rgba(0, 150, 255, 0.2),
+            transparent 70%
+        );
+
+    filter:
+        blur(10px);
+
+    animation:
+        coreGlow 2s ease-in-out infinite;
+
+}
+
+
+@keyframes coreGlow {
+
+    0%,
+    100% {
+        transform: scale(0.9);
+        opacity: 0.65;
+    }
+
+    50% {
+        transform: scale(1.15);
+        opacity: 1;
+    }
+
+}
+
+
+/* =====================================================
+   CORE RINGS
+   ===================================================== */
+
+.core-ring {
+
+    position: absolute;
+
+    border-radius: 50%;
+
+    border:
+        1px solid rgba(0, 205, 255, 0.65);
+
+    box-shadow:
+        0 0 15px rgba(0, 180, 255, 0.25);
+
+}
+
+
+.ring-one {
+
+    width: 220px;
+    height: 220px;
+
+    border-top-color:
+        #5ceaff;
+
+    border-bottom-color:
+        transparent;
+
+    animation:
+        rotateClockwise 9s linear infinite;
+
+}
+
+
+.ring-two {
+
+    width: 185px;
+    height: 185px;
+
+    border-left-color:
+        #70efff;
+
+    border-right-color:
+        transparent;
+
+    animation:
+        rotateCounter 6s linear infinite;
+
+}
+
+
+.ring-three {
+
+    width: 145px;
+    height: 145px;
+
+    border-top-color:
+        #a0f5ff;
+
+    border-bottom-color:
+        transparent;
+
+    animation:
+        rotateClockwise 4s linear infinite;
+
+}
+
+
+.ring-four {
+
+    width: 120px;
+    height: 120px;
+
+    border:
+        2px dashed rgba(80, 220, 255, 0.55);
+
+    animation:
+        rotateCounter 8s linear infinite;
+
+}
+
+
+@keyframes rotateClockwise {
+
+    from {
+        transform:
+            rotate(0deg);
+    }
+
+    to {
+        transform:
+            rotate(360deg);
+    }
+
+}
+
+
+@keyframes rotateCounter {
+
+    from {
+        transform:
+            rotate(360deg);
+    }
+
+    to {
+        transform:
+            rotate(0deg);
+    }
+
+}
+
+
+/* =====================================================
+   CORE CENTER
+   ===================================================== */
+
+.core-center {
+
+    width: 78px;
+
+    height: 78px;
+
+    border-radius: 50%;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    background:
+        radial-gradient(
+            circle,
+            #c9faff,
+            #35d8ff 35%,
+            #087baf 70%,
+            #02354d
+        );
+
+    box-shadow:
+
+        0 0 15px #4deaff,
+
+        0 0 35px rgba(0, 220, 255, 0.8),
+
+        0 0 70px rgba(0, 180, 255, 0.4);
+
+    z-index: 5;
+
+}
+
+
+.core-center span {
+
+    font-size: 35px;
+
+    font-weight: 700;
+
+    color: #00131d;
+
+    text-shadow:
+        0 0 5px white;
+
+}
+
+
+/* =====================================================
+   READY STATUS
+   ===================================================== */
 
 .ready {
-    font-size: 16px;
-    letter-spacing: 5px;
-    margin-bottom: 25px;
+
+    font-size: 13px;
+
+    letter-spacing: 3px;
+
+    color: #75dfff;
+
+    margin-bottom: 22px;
+
 }
 
 
-/* COMMAND */
+.status-indicator {
+
+    color: #66ffcc;
+
+    text-shadow:
+        0 0 8px #66ffcc;
+
+}
+
+
+/* =====================================================
+   COMMAND AREA
+   ===================================================== */
 
 .command-area {
+
+    width: min(
+        800px,
+        95%
+    );
+
+    margin:
+        0 auto;
+
     display: flex;
-    justify-content: center;
+
     gap: 10px;
 
-    flex-wrap: wrap;
 }
 
-input {
-    width: min(500px, 80vw);
 
-    padding: 16px;
+.command-area input {
 
-    background: rgba(0, 20, 30, 0.8);
+    flex: 1;
 
-    color: white;
+    min-width: 0;
 
-    border: 1px solid #00d9ff;
+    padding:
+        16px 18px;
+
+    border:
+        1px solid rgba(70, 215, 255, 0.4);
 
     border-radius: 6px;
 
-    font-size: 16px;
+    background:
+        rgba(2, 17, 27, 0.85);
+
+    color: #e9fcff;
 
     outline: none;
+
+    font-size: 14px;
+
+    box-shadow:
+        inset 0 0 15px rgba(0, 180, 255, 0.05);
+
 }
 
-input:focus {
-    box-shadow: 0 0 15px rgba(0, 217, 255, 0.4);
+
+.command-area input:focus {
+
+    border-color:
+        #58ddff;
+
+    box-shadow:
+        0 0 15px rgba(0, 210, 255, 0.2);
+
 }
 
+
+.command-area input::placeholder {
+
+    color:
+        #507788;
+
+}
+
+
+/* =====================================================
+   BUTTONS
+   ===================================================== */
 
 button {
-    padding: 15px 22px;
 
-    background: rgba(0, 217, 255, 0.08);
+    border:
+        1px solid rgba(70, 215, 255, 0.5);
 
-    color: #00d9ff;
+    background:
+        rgba(4, 38, 55, 0.8);
 
-    border: 1px solid #00d9ff;
+    color:
+        #a8efff;
 
-    border-radius: 6px;
+    padding:
+        11px 18px;
+
+    border-radius: 5px;
 
     cursor: pointer;
 
-    font-weight: bold;
+    font-size: 11px;
 
-    transition: 0.2s;
+    font-weight: 600;
+
+    letter-spacing: 1.5px;
+
+    transition:
+        0.2s ease;
+
 }
 
-button:hover {
-    background: #00d9ff;
-    color: #03070c;
 
-    box-shadow: 0 0 20px rgba(0, 217, 255, 0.5);
+button:hover {
+
+    background:
+        rgba(0, 160, 210, 0.25);
+
+    border-color:
+        #67e7ff;
+
+    box-shadow:
+        0 0 15px rgba(0, 200, 255, 0.2);
+
+    transform:
+        translateY(-1px);
+
+}
+
+
+.send-button {
+
+    min-width: 80px;
+
 }
 
 
 .voice-button {
+
+    width: 52px;
+
+    padding: 0;
+
     font-size: 18px;
+
 }
 
 
-/* RESPONSE */
+/* =====================================================
+   RESPONSE
+   ===================================================== */
 
-#response {
-    margin: 25px auto;
+.response-box {
 
-    max-width: 700px;
+    width: min(
+        800px,
+        95%
+    );
 
-    min-height: 30px;
+    min-height: 65px;
 
-    padding: 15px;
+    margin:
+        20px auto 0;
 
-    border-left: 2px solid #00d9ff;
+    padding:
+        16px 20px;
 
-    background: rgba(0, 217, 255, 0.04);
+    text-align: left;
+
+    border-left:
+        2px solid #45dfff;
+
+    background:
+        rgba(2, 17, 27, 0.55);
+
+    box-shadow:
+        inset 0 0 20px rgba(0, 190, 255, 0.04);
+
+    line-height: 1.6;
+
+    font-size: 14px;
+
 }
 
 
-/* DASHBOARD */
+.response-label {
+
+    display: block;
+
+    font-size: 9px;
+
+    letter-spacing: 3px;
+
+    color:
+        #43dfff;
+
+    margin-bottom: 5px;
+
+}
+
+
+.response-text {
+
+    color:
+        #c9edf5;
+
+}
+
+
+/* =====================================================
+   DASHBOARD
+   ===================================================== */
 
 .dashboard {
-    margin-top: 50px;
 
     display: grid;
 
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns:
+        repeat(
+            3,
+            1fr
+        );
 
-    gap: 20px;
+    gap: 15px;
+
+    margin-top: 15px;
+
 }
 
 
 .panel {
-    padding: 25px;
 
-    border: 1px solid rgba(0, 217, 255, 0.35);
+    padding:
+        20px;
 
-    background: rgba(0, 20, 30, 0.45);
+    min-height: 170px;
 
-    border-radius: 8px;
+    border:
+        1px solid rgba(70, 190, 230, 0.18);
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(5, 29, 42, 0.8),
+            rgba(2, 14, 23, 0.75)
+        );
+
+    position: relative;
+
+    overflow: hidden;
+
+    transition:
+        0.25s ease;
+
 }
+
+
+.panel::before {
+
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+
+    left: 0;
+
+    width: 35px;
+
+    height: 2px;
+
+    background:
+        #4de4ff;
+
+    box-shadow:
+        0 0 10px #4de4ff;
+
+}
+
+
+.panel:hover {
+
+    border-color:
+        rgba(70, 220, 255, 0.45);
+
+    transform:
+        translateY(-3px);
+
+    box-shadow:
+        0 10px 30px rgba(0, 130, 180, 0.12);
+
+}
+
+
+.panel-header {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    margin-bottom: 18px;
+
+}
+
+
+.panel-icon {
+
+    color:
+        #53dcff;
+
+    font-size: 18px;
+
+}
+
 
 .panel h2 {
-    font-size: 17px;
 
-    letter-spacing: 3px;
-}
-
-.panel p {
-    color: #b7eaf2;
-
-    min-height: 35px;
-}
-
-
-/* FOOTER */
-
-footer {
-    text-align: center;
-
-    padding: 30px;
-
-    font-size: 11px;
+    font-size: 12px;
 
     letter-spacing: 2px;
 
-    opacity: 0.5;
+    font-weight: 600;
+
+    color:
+        #9deaff;
+
 }
 
 
-/* MOBILE */
+.panel p {
 
-@media (max-width: 700px) {
+    color:
+        #6695a5;
 
-    header {
-        padding: 20px;
-    }
+    font-size: 12px;
 
-    .logo {
-        font-size: 20px;
-    }
+    line-height: 1.6;
 
-    .system-status {
-        font-size: 9px;
-    }
+    min-height: 42px;
+
+    margin-bottom: 15px;
+
+}
+
+
+.panel button {
+
+    width: 100%;
+
+}
+
+
+/* =====================================================
+   SYSTEM PANEL
+   ===================================================== */
+
+.system-data {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 9px;
+
+}
+
+
+.system-data div {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    padding:
+        7px 0;
+
+    border-bottom:
+        1px solid rgba(100, 200, 230, 0.08);
+
+}
+
+
+.system-data span {
+
+    font-size: 10px;
+
+    letter-spacing: 1.5px;
+
+    color:
+        #527b8a;
+
+}
+
+
+.system-data strong {
+
+    font-size: 9px;
+
+    letter-spacing: 1px;
+
+    color:
+        #66ffcc;
+
+}
+
+
+/* =====================================================
+   FOOTER
+   ===================================================== */
+
+footer {
+
+    text-align: center;
+
+    padding:
+        30px 20px;
+
+    margin-top: 30px;
+
+    font-size: 9px;
+
+    letter-spacing: 2px;
+
+    color:
+        #416c7b;
+
+}
+
+
+footer span {
+
+    margin:
+        0 8px;
+
+    color:
+        #2d7285;
+
+}
+
+
+/* =====================================================
+   MOBILE
+   ===================================================== */
+
+@media (
+    max-width: 900px
+) {
 
     .dashboard {
-        grid-template-columns: 1fr;
+
+        grid-template-columns:
+            repeat(
+                2,
+                1fr
+            );
+
     }
+
+}
+
+
+@media (
+    max-width: 600px
+) {
+
+    header {
+
+        padding:
+            18px;
+
+    }
+
+
+    .logo {
+
+        font-size: 20px;
+
+    }
+
+
+    .system-status {
+
+        font-size: 9px;
+
+    }
+
+
+    main {
+
+        width: 94%;
+
+        margin-top: 20px;
+
+    }
+
 
     .core {
-        width: 210px;
-        height: 210px;
+
+        width: 230px;
+
+        height: 230px;
+
     }
+
 
     .ring-one {
-        width: 200px;
-        height: 200px;
+
+        width: 190px;
+
+        height: 190px;
+
     }
+
 
     .ring-two {
-        width: 165px;
-        height: 165px;
+
+        width: 160px;
+
+        height: 160px;
+
     }
 
+
     .ring-three {
-        width: 120px;
-        height: 120px;
+
+        width: 125px;
+
+        height: 125px;
+
     }
+
+
+    .ring-four {
+
+        width: 105px;
+
+        height: 105px;
+
+    }
+
+
+    .command-area {
+
+        flex-wrap: wrap;
+
+    }
+
+
+    .command-area input {
+
+        flex-basis: 100%;
+
+    }
+
+
+    .send-button {
+
+        flex: 1;
+
+    }
+
+
+    .voice-button {
+
+        width: 55px;
+
+    }
+
+
+    .dashboard {
+
+        grid-template-columns:
+            1fr;
+
+    }
+
+
+    .panel {
+
+        min-height: 150px;
+
+    }
+
 }
