@@ -1,7 +1,6 @@
 // =====================================================
 // J.A.R.V.I.S.
-// COMPLETE FRONTEND SCRIPT
-// AI + MEMORY + VOICE + STUDY HUB + TIMER + HOMEWORK
+// PROTOTYPE 8.5
 // =====================================================
 
 
@@ -14,10 +13,13 @@ const WORKER_URL =
 
 
 // =====================================================
-// GLOBAL VARIABLES
+// DATA
 // =====================================================
 
-let conversationHistory = [];
+let conversationHistory =
+    JSON.parse(
+        localStorage.getItem("jarvisConversation") || "[]"
+    );
 
 let jarvisMemory =
     JSON.parse(
@@ -29,78 +31,59 @@ let homework =
         localStorage.getItem("jarvisHomework") || "[]"
     );
 
-let timerInterval = null;
+let schedule =
+    JSON.parse(
+        localStorage.getItem("jarvisSchedule") || "[]"
+    );
 
-let totalStudySeconds = 0;
-
-let remainingStudySeconds = 0;
-
-let studyTimerRunning = false;
-
-let currentStudyTask = null;
-
-let recognition = null;
-
-let voiceAvailable = false;
-
-let isListening = false;
+let tests =
+    JSON.parse(
+        localStorage.getItem("jarvisTests") || "[]"
+    );
 
 
 // =====================================================
-// PAGE INITIALISATION
+// INITIALISE
 // =====================================================
 
 document.addEventListener(
     "DOMContentLoaded",
     () => {
 
-        console.log(
-            "JARVIS initialising..."
-        );
+        updateMemoryCount();
 
-        loadHomework();
+        renderHomework();
+
+        renderSchedule();
+
+        renderTests();
+
+        updateDashboardSummaries();
+
+        setupCommandInput();
 
         initialiseVoice();
-
-        updateMemoryDisplay();
-
-        setupKeyboard();
-
-        updateSystemStatus();
-
-        setTimeout(
-            () => {
-
-                showResponse(
-                    "JARVIS online. All systems initialised."
-                );
-
-            },
-            500
-        );
 
     }
 );
 
 
 // =====================================================
-// KEYBOARD SUPPORT
+// COMMAND INPUT
 // =====================================================
 
-function setupKeyboard() {
+function setupCommandInput() {
 
     const input =
         document.getElementById(
             "commandInput"
         );
 
-    if (!input) {
-        return;
-    }
+    if (!input) return;
 
     input.addEventListener(
         "keydown",
-        (event) => {
+        event => {
 
             if (
                 event.key === "Enter"
@@ -117,30 +100,7 @@ function setupKeyboard() {
 
 
 // =====================================================
-// SYSTEM STATUS
-// =====================================================
-
-function updateSystemStatus() {
-
-    const status =
-        document.querySelector(
-            ".system-status"
-        );
-
-    if (!status) {
-        return;
-    }
-
-    status.innerHTML = `
-        <span class="status-dot">●</span>
-        SYSTEM ONLINE
-    `;
-
-}
-
-
-// =====================================================
-// AI COMMAND SYSTEM
+// AI
 // =====================================================
 
 async function sendCommand() {
@@ -150,33 +110,21 @@ async function sendCommand() {
             "commandInput"
         );
 
-    if (!input) {
-        return;
-    }
-
     const message =
         input.value.trim();
 
-    if (!message) {
-        return;
-    }
+    if (!message) return;
 
-
-    // Clear input
 
     input.value = "";
 
-
-    // Show user message
-
-    showUserMessage(
-        message
-    );
-
-
-    // Show thinking state
+    showUserMessage(message);
 
     showThinking();
+
+    setAIStatus(
+        "CONNECTING..."
+    );
 
 
     try {
@@ -193,19 +141,18 @@ async function sendCommand() {
                             "application/json"
                     },
 
-                    body:
-                        JSON.stringify({
+                    body: JSON.stringify({
 
-                            message:
-                                message,
+                        message:
+                            message,
 
-                            history:
-                                conversationHistory,
+                        history:
+                            conversationHistory,
 
-                            memory:
-                                jarvisMemory
+                        memory:
+                            jarvisMemory
 
-                        })
+                    })
 
                 }
             );
@@ -219,39 +166,45 @@ async function sendCommand() {
 
             throw new Error(
                 data.error ||
-                "JARVIS server error."
+                "Worker returned an error."
             );
 
         }
 
 
-        const answer =
-            data.response ||
-            "I could not generate a response.";
+        if (
+            !data.response
+        ) {
+
+            throw new Error(
+                "No AI response received."
+            );
+
+        }
 
 
-        // Save conversation
+        conversationHistory.push({
 
-        conversationHistory.push(
-            {
-                role: "user",
-                content: message
-            }
-        );
+            role: "user",
 
-        conversationHistory.push(
-            {
-                role: "assistant",
-                content: answer
-            }
-        );
+            content:
+                message
+
+        });
 
 
-        // Limit history size
+        conversationHistory.push({
+
+            role: "assistant",
+
+            content:
+                data.response
+
+        });
+
 
         if (
-            conversationHistory.length >
-            20
+            conversationHistory.length > 20
         ) {
 
             conversationHistory =
@@ -262,39 +215,51 @@ async function sendCommand() {
         }
 
 
-        // Display answer
+        localStorage.setItem(
+            "jarvisConversation",
+            JSON.stringify(
+                conversationHistory
+            )
+        );
+
 
         showResponse(
-            answer
+            data.response
         );
 
 
-        // Speak answer
+        setAIStatus(
+            "ONLINE"
+        );
+
 
         speak(
-            answer
+            data.response
         );
 
 
-        // Check whether user asked JARVIS
-        // to remember something
-
-        detectMemoryRequest(
+        detectMemory(
             message
         );
 
-    }
 
-    catch (error) {
+    } catch (error) {
 
         console.error(
-            "JARVIS error:",
+            "JARVIS AI ERROR:",
             error
         );
 
 
         showResponse(
-            "I am unable to connect to my AI core right now."
+            "AI connection failed.\n\n" +
+            "JARVIS could not connect to the AI server.\n\n" +
+            "Please check that the Cloudflare Worker is deployed and that the OPENAI_API_KEY secret is configured."
+        );
+
+
+        setAIStatus(
+            "OFFLINE"
         );
 
     }
@@ -303,132 +268,277 @@ async function sendCommand() {
 
 
 // =====================================================
-// RESPONSE DISPLAY
-// =====================================================
-
-function showResponse(
-    text
-) {
-
-    const response =
-        document.getElementById(
-            "response"
-        );
-
-    if (!response) {
-        return;
-    }
-
-
-    response.innerHTML = `
-
-        <span class="response-label">
-            JARVIS
-        </span>
-
-        <span class="response-text">
-            ${formatText(text)}
-        </span>
-
-    `;
-
-}
-
-
-// =====================================================
-// USER MESSAGE DISPLAY
-// =====================================================
-
-function showUserMessage(
-    message
-) {
-
-    const response =
-        document.getElementById(
-            "response"
-        );
-
-    if (!response) {
-        return;
-    }
-
-
-    response.innerHTML = `
-
-        <span class="response-label">
-            COMMAND
-        </span>
-
-        <span class="response-text">
-            ${formatText(message)}
-        </span>
-
-    `;
-
-}
-
-
-// =====================================================
-// THINKING DISPLAY
+// UI RESPONSE
 // =====================================================
 
 function showThinking() {
 
-    const response =
+    document.getElementById(
+        "responseBox"
+    ).textContent =
+        "JARVIS is processing your request...";
+
+}
+
+
+function showUserMessage(message) {
+
+    document.getElementById(
+        "responseBox"
+    ).textContent =
+        "YOU: " + message;
+
+}
+
+
+function showResponse(response) {
+
+    document.getElementById(
+        "responseBox"
+    ).textContent =
+        response;
+
+}
+
+
+function setAIStatus(status) {
+
+    const element =
         document.getElementById(
-            "response"
+            "aiStatus"
         );
 
-    if (!response) {
-        return;
+    if (element) {
+
+        element.textContent =
+            status;
+
     }
-
-
-    response.innerHTML = `
-
-        <span class="response-label">
-            JARVIS
-        </span>
-
-        <span class="response-text">
-            Processing...
-        </span>
-
-    `;
 
 }
 
 
 // =====================================================
-// BASIC TEXT FORMATTING
+// MEMORY
 // =====================================================
 
-function formatText(
-    text
-) {
+function detectMemory(message) {
 
-    if (!text) {
-        return "";
+    const lower =
+        message.toLowerCase();
+
+
+    const triggers = [
+
+        "remember that",
+
+        "remember my",
+
+        "don't forget",
+
+        "save this"
+
+    ];
+
+
+    const matched =
+        triggers.some(
+            trigger =>
+                lower.includes(trigger)
+        );
+
+
+    if (!matched) return;
+
+
+    let memory =
+        message;
+
+
+    memory =
+        memory.replace(
+            /remember that/i,
+            ""
+        );
+
+    memory =
+        memory.replace(
+            /remember my/i,
+            ""
+        );
+
+    memory =
+        memory.replace(
+            /don't forget/i,
+            ""
+        );
+
+    memory =
+        memory.replace(
+            /save this/i,
+            ""
+        );
+
+
+    memory =
+        memory.trim();
+
+
+    if (!memory) return;
+
+
+    jarvisMemory.push(
+        memory
+    );
+
+
+    localStorage.setItem(
+        "jarvisMemory",
+        JSON.stringify(
+            jarvisMemory
+        )
+    );
+
+
+    updateMemoryCount();
+
+}
+
+
+function updateMemoryCount() {
+
+    const count =
+        document.getElementById(
+            "memoryCount"
+        );
+
+    if (count) {
+
+        count.textContent =
+            jarvisMemory.length;
+
+    }
+
+}
+
+
+function openMemory() {
+
+    const modal =
+        document.getElementById(
+            "memoryModal"
+        );
+
+    renderMemory();
+
+    modal.classList.add(
+        "active"
+    );
+
+}
+
+
+function closeMemory() {
+
+    document
+        .getElementById(
+            "memoryModal"
+        )
+        .classList.remove(
+            "active"
+        );
+
+}
+
+
+function renderMemory() {
+
+    const list =
+        document.getElementById(
+            "memoryList"
+        );
+
+    if (
+        jarvisMemory.length === 0
+    ) {
+
+        list.innerHTML =
+            "<p>No saved memories.</p>";
+
+        return;
+
     }
 
 
-    return text
-        .replace(
-            /&/g,
-            "&amp;"
+    list.innerHTML =
+        jarvisMemory
+            .map(
+                (memory, index) => `
+
+                    <div class="homework-item">
+
+                        <div class="item-title">
+                            Memory ${index + 1}
+                        </div>
+
+                        <div class="item-meta">
+                            ${escapeHTML(memory)}
+                        </div>
+
+                        <div class="item-actions">
+
+                            <button
+                                onclick="deleteMemory(${index})"
+                            >
+                                DELETE
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                `
+            )
+            .join("");
+
+}
+
+
+function deleteMemory(index) {
+
+    jarvisMemory.splice(
+        index,
+        1
+    );
+
+    localStorage.setItem(
+        "jarvisMemory",
+        JSON.stringify(
+            jarvisMemory
         )
-        .replace(
-            /</g,
-            "&lt;"
+    );
+
+    updateMemoryCount();
+
+    renderMemory();
+
+}
+
+
+function clearMemory() {
+
+    jarvisMemory = [];
+
+    localStorage.setItem(
+        "jarvisMemory",
+        JSON.stringify(
+            jarvisMemory
         )
-        .replace(
-            />/g,
-            "&gt;"
-        )
-        .replace(
-            /\n/g,
-            "<br>"
-        );
+    );
+
+    updateMemoryCount();
+
+    renderMemory();
 
 }
 
@@ -436,6 +546,11 @@ function formatText(
 // =====================================================
 // VOICE RECOGNITION
 // =====================================================
+
+let recognition = null;
+
+let voiceAvailable = false;
+
 
 function initialiseVoice() {
 
@@ -446,11 +561,9 @@ function initialiseVoice() {
 
     if (!SpeechRecognition) {
 
-        console.log(
-            "Speech recognition is not supported."
+        updateVoiceStatus(
+            "VOICE NOT SUPPORTED"
         );
-
-        voiceAvailable = false;
 
         return;
 
@@ -461,60 +574,40 @@ function initialiseVoice() {
         new SpeechRecognition();
 
 
-    recognition.continuous = true;
+    recognition.continuous =
+        true;
 
-    recognition.interimResults = false;
+    recognition.interimResults =
+        false;
 
-    recognition.lang = "en-SG";
-
-
-    recognition.onstart =
-        () => {
-
-            isListening = true;
-
-            updateVoiceStatus(
-                "LISTENING"
-            );
-
-        };
+    recognition.lang =
+        "en-SG";
 
 
     recognition.onresult =
-        (event) => {
+        event => {
 
-            const lastResult =
+            const result =
                 event.results[
                     event.results.length - 1
                 ];
 
             const transcript =
-                lastResult[0].transcript.trim();
+                result[0].transcript.trim();
 
 
-            if (!transcript) {
-                return;
-            }
+            if (!transcript) return;
 
 
-            console.log(
-                "Voice command:",
-                transcript
+            updateVoiceStatus(
+                "COMMAND RECEIVED"
             );
 
 
-            const input =
-                document.getElementById(
-                    "commandInput"
-                );
-
-
-            if (input) {
-
-                input.value =
-                    transcript;
-
-            }
+            document.getElementById(
+                "commandInput"
+            ).value =
+                transcript;
 
 
             sendCommand();
@@ -523,37 +616,25 @@ function initialiseVoice() {
 
 
     recognition.onerror =
-        (event) => {
+        event => {
 
             console.log(
-                "Voice recognition:",
+                "Voice error:",
                 event.error
             );
 
-
-            isListening = false;
-
-            updateVoiceStatus(
-                "VOICE READY"
-            );
-
-
-            /*
-             * Some browsers report "not-allowed"
-             * when microphone permission has not
-             * been granted.
-             */
 
             if (
                 event.error ===
                 "not-allowed"
             ) {
 
-                console.log(
-                    "Microphone permission required."
-                );
+                voiceAvailable =
+                    false;
 
-                return;
+                updateVoiceStatus(
+                    "MICROPHONE PERMISSION NEEDED"
+                );
 
             }
 
@@ -562,19 +643,6 @@ function initialiseVoice() {
 
     recognition.onend =
         () => {
-
-            isListening = false;
-
-
-            updateVoiceStatus(
-                "VOICE READY"
-            );
-
-
-            /*
-             * Automatically restart listening
-             * when possible.
-             */
 
             if (
                 voiceAvailable
@@ -587,14 +655,11 @@ function initialiseVoice() {
 
                             recognition.start();
 
-                        }
-
-                        catch (
-                            error
-                        ) {
+                        } catch (error) {
 
                             console.log(
-                                "Voice restart waiting..."
+                                "Voice restart:",
+                                error
                             );
 
                         }
@@ -608,63 +673,27 @@ function initialiseVoice() {
         };
 
 
-    voiceAvailable = true;
-
-
-    /*
-     * Attempt automatic startup.
-     *
-     * Chrome may require the user to interact
-     * with the page before allowing microphone
-     * access.
-     */
-
-    setTimeout(
-        () => {
-
-            startListening();
-
-        },
-        1200
-    );
-
-}
-
-
-// =====================================================
-// START LISTENING
-// =====================================================
-
-function startListening() {
-
-    if (
-        !recognition ||
-        !voiceAvailable
-    ) {
-
-        return;
-
-    }
-
-
-    if (isListening) {
-        return;
-    }
+    voiceAvailable =
+        true;
 
 
     try {
 
         recognition.start();
 
-    }
+        updateVoiceStatus(
+            "LISTENING FOR JARVIS"
+        );
 
-    catch (
-        error
-    ) {
+    } catch (error) {
 
         console.log(
-            "Unable to start voice:",
+            "Voice start:",
             error
+        );
+
+        updateVoiceStatus(
+            "VOICE READY"
         );
 
     }
@@ -672,53 +701,31 @@ function startListening() {
 }
 
 
-// =====================================================
-// VOICE STATUS
-// =====================================================
+function updateVoiceStatus(status) {
 
-function updateVoiceStatus(
-    status
-) {
+    const statusElement =
+        document.getElementById(
+            "voiceStatus"
+        );
 
-    const systemData =
-        document.querySelectorAll(
-            ".system-data strong"
+    const panelElement =
+        document.getElementById(
+            "voicePanelStatus"
         );
 
 
-    /*
-     * The third system item is VOICE.
-     */
+    if (statusElement) {
 
-    if (
-        systemData.length >= 3
-    ) {
-
-        systemData[2].textContent =
+        statusElement.textContent =
             status;
 
     }
 
 
-    const ready =
-        document.querySelector(
-            ".ready"
-        );
+    if (panelElement) {
 
-
-    if (ready) {
-
-        ready.innerHTML = `
-
-            <span class="status-indicator">
-                ●
-            </span>
-
-            ${status === "LISTENING"
-                ? "LISTENING FOR COMMAND"
-                : "READY FOR COMMAND"}
-
-        `;
+        panelElement.textContent =
+            status;
 
     }
 
@@ -726,285 +733,37 @@ function updateVoiceStatus(
 
 
 // =====================================================
-// TEXT-TO-SPEECH
+// TEXT TO SPEECH
 // =====================================================
 
-function speak(
-    text
-) {
+function speak(text) {
 
     if (
         !("speechSynthesis" in window)
-    ) {
-
-        return;
-
-    }
+    ) return;
 
 
     speechSynthesis.cancel();
 
 
-    const cleanText =
-        text
-            .replace(
-                /[*#_`]/g,
-                ""
-            )
-            .replace(
-                /\n/g,
-                " "
-            );
-
-
-    const utterance =
+    const speech =
         new SpeechSynthesisUtterance(
-            cleanText
+            text
         );
 
 
-    utterance.lang =
+    speech.lang =
         "en-SG";
 
-    utterance.rate =
+    speech.rate =
         1;
 
-    utterance.pitch =
+    speech.pitch =
         0.9;
-
-    utterance.volume =
-        1;
 
 
     speechSynthesis.speak(
-        utterance
-    );
-
-}
-
-
-// =====================================================
-// MEMORY SYSTEM
-// =====================================================
-
-function detectMemoryRequest(
-    message
-) {
-
-    const lower =
-        message.toLowerCase();
-
-
-    const memoryTriggers = [
-
-        "remember that",
-
-        "remember this",
-
-        "remember my",
-
-        "don't forget",
-
-        "do not forget",
-
-        "save this",
-
-        "save that"
-
-    ];
-
-
-    const matched =
-        memoryTriggers.some(
-            trigger =>
-                lower.includes(
-                    trigger
-                )
-        );
-
-
-    if (!matched) {
-        return;
-    }
-
-
-    let memoryText =
-        message;
-
-
-    const patterns = [
-
-        "remember that",
-
-        "remember this",
-
-        "remember my",
-
-        "don't forget",
-
-        "do not forget",
-
-        "save this",
-
-        "save that"
-
-    ];
-
-
-    for (
-        const pattern of patterns
-    ) {
-
-        const index =
-            lower.indexOf(
-                pattern
-            );
-
-
-        if (
-            index !== -1
-        ) {
-
-            memoryText =
-                message
-                    .substring(
-                        index +
-                        pattern.length
-                    )
-                    .trim();
-
-            break;
-
-        }
-
-    }
-
-
-    if (!memoryText) {
-        return;
-    }
-
-
-    saveMemory(
-        memoryText
-    );
-
-}
-
-
-// =====================================================
-// SAVE MEMORY
-// =====================================================
-
-function saveMemory(
-    memoryText
-) {
-
-    if (
-        jarvisMemory.includes(
-            memoryText
-        )
-    ) {
-
-        return;
-
-    }
-
-
-    jarvisMemory.push(
-        memoryText
-    );
-
-
-    localStorage.setItem(
-        "jarvisMemory",
-        JSON.stringify(
-            jarvisMemory
-        )
-    );
-
-
-    updateMemoryDisplay();
-
-
-    console.log(
-        "Memory saved:",
-        memoryText
-    );
-
-}
-
-
-// =====================================================
-// MEMORY DISPLAY
-// =====================================================
-
-function updateMemoryDisplay() {
-
-    const memoryPanel =
-        document.querySelector(
-            ".memory-panel p"
-        );
-
-
-    if (!memoryPanel) {
-        return;
-    }
-
-
-    if (
-        jarvisMemory.length === 0
-    ) {
-
-        memoryPanel.textContent =
-            "No saved memories yet.";
-
-        return;
-
-    }
-
-
-    memoryPanel.textContent =
-        `${jarvisMemory.length} saved memories available.`;
-
-}
-
-
-// =====================================================
-// MEMORY WINDOW
-// =====================================================
-
-function openMemory() {
-
-    let memoryText =
-        "";
-
-
-    if (
-        jarvisMemory.length === 0
-    ) {
-
-        memoryText =
-            "No saved memories yet.";
-
-    }
-
-    else {
-
-        memoryText =
-            jarvisMemory
-                .map(
-                    (memory, index) =>
-                        `${index + 1}. ${memory}`
-                )
-                .join("\n");
-
-    }
-
-
-    alert(
-        "JARVIS MEMORY\n\n" +
-        memoryText
+        speech
     );
 
 }
@@ -1014,45 +773,40 @@ function openMemory() {
 // STUDY HUB
 // =====================================================
 
+let studyTimer = null;
+
+let studySeconds = 0;
+
+let studyTotalSeconds = 0;
+
+let studyRunning = false;
+
+
 function openStudyHub() {
 
-    const hub =
-        document.getElementById(
-            "studyHub"
+    document
+        .getElementById(
+            "studyModal"
+        )
+        .classList.add(
+            "active"
         );
-
-
-    if (hub) {
-
-        hub.style.display =
-            "flex";
-
-    }
 
 }
 
 
 function closeStudyHub() {
 
-    const hub =
-        document.getElementById(
-            "studyHub"
+    document
+        .getElementById(
+            "studyModal"
+        )
+        .classList.remove(
+            "active"
         );
-
-
-    if (hub) {
-
-        hub.style.display =
-            "none";
-
-    }
 
 }
 
-
-// =====================================================
-// GENERATE STUDY SESSION
-// =====================================================
 
 function generateStudySession() {
 
@@ -1069,7 +823,7 @@ function generateStudySession() {
 
 
     const duration =
-        parseInt(
+        Number(
             document.getElementById(
                 "studyDuration"
             ).value
@@ -1085,7 +839,7 @@ function generateStudySession() {
     if (!topic) {
 
         alert(
-            "Please enter a study topic."
+            "Please enter a topic."
         );
 
         return;
@@ -1093,234 +847,64 @@ function generateStudySession() {
     }
 
 
-    currentStudyTask = {
-
-        subject:
-            subject,
-
-        topic:
-            topic,
-
-        duration:
-            duration,
-
-        goal:
-            goal
-
-    };
-
-
-    totalStudySeconds =
+    studyTotalSeconds =
         duration * 60;
 
-
-    remainingStudySeconds =
-        totalStudySeconds;
-
-
-    updateTimerDisplay();
+    studySeconds =
+        studyTotalSeconds;
 
 
-    document.getElementById(
-        "sessionSubject"
-    ).textContent =
-        subject;
+    studyRunning =
+        false;
 
 
-    document.getElementById(
-        "sessionTopic"
-    ).textContent =
-        topic;
-
-
-    document.getElementById(
-        "sessionStatus"
-    ).textContent =
-        "READY";
+    document
+        .getElementById(
+            "studySession"
+        )
+        .classList.remove(
+            "hidden"
+        );
 
 
     document.getElementById(
         "currentTask"
     ).textContent =
-        getStudyTask(
-            goal
-        );
+        `${goal}: ${subject} — ${topic}`;
 
 
-    document.getElementById(
-        "studyResult"
-    ).innerHTML = `
-
-        <div class="response-label">
-            JARVIS STUDY SYSTEM
-        </div>
-
-        <p>
-            Study session generated for
-            <strong>${subject}</strong>:
-            ${topic}
-        </p>
-
-        <p>
-            Duration:
-            <strong>${duration} minutes</strong>
-        </p>
-
-        <p>
-            Goal:
-            <strong>${goal}</strong>
-        </p>
-
-    `;
-
-
-    document.getElementById(
-        "activeStudySession"
-    ).style.display =
-        "block";
-
-
-    updateProgress(
-        0
-    );
-
-
-    resetTimer();
+    updateTimer();
 
 }
 
-
-// =====================================================
-// STUDY TASK GENERATOR
-// =====================================================
-
-function getStudyTask(
-    goal
-) {
-
-    switch (
-        goal
-    ) {
-
-        case "Learn the topic":
-
-            return (
-                "Read and understand the key concepts."
-            );
-
-
-        case "Revise":
-
-            return (
-                "Review your notes and recall the main ideas."
-            );
-
-
-        case "Prepare for a test":
-
-            return (
-                "Review key concepts, formulas and common question types."
-            );
-
-
-        case "Practise questions":
-
-            return (
-                "Attempt practice questions without looking at the answers."
-            );
-
-
-        case "Memorise key concepts":
-
-            return (
-                "Use active recall to memorise the important information."
-            );
-
-
-        default:
-
-            return (
-                "Begin studying your selected topic."
-            );
-
-    }
-
-}
-
-
-// =====================================================
-// STUDY TIMER
-// =====================================================
 
 function startTimer() {
 
-    if (
-        !currentStudyTask
-    ) {
-
-        alert(
-            "Generate a study session first."
-        );
-
-        return;
-
-    }
+    if (studyRunning) return;
 
 
-    if (
-        studyTimerRunning
-    ) {
-
-        return;
-
-    }
-
-
-    studyTimerRunning =
+    studyRunning =
         true;
 
 
-    document.getElementById(
-        "sessionStatus"
-    ).textContent =
-        "RUNNING";
-
-
-    timerInterval =
+    studyTimer =
         setInterval(
             () => {
 
                 if (
-                    remainingStudySeconds <= 0
+                    studySeconds <= 0
                 ) {
 
-                    finishStudySession();
+                    finishSession();
 
                     return;
 
                 }
 
 
-                remainingStudySeconds--;
+                studySeconds--;
 
-
-                updateTimerDisplay();
-
-
-                const completed =
-                    1 -
-                    (
-                        remainingStudySeconds /
-                        totalStudySeconds
-                    );
-
-
-                updateProgress(
-                    completed * 100
-                );
-
-
-                updateCurrentStudyTask();
+                updateTimer();
 
             },
             1000
@@ -1329,406 +913,141 @@ function startTimer() {
 }
 
 
-// =====================================================
-// PAUSE TIMER
-// =====================================================
-
 function pauseTimer() {
 
-    if (
-        !studyTimerRunning
-    ) {
-
-        return;
-
-    }
-
-
-    clearInterval(
-        timerInterval
-    );
-
-
-    timerInterval =
-        null;
-
-
-    studyTimerRunning =
+    studyRunning =
         false;
 
 
-    document.getElementById(
-        "sessionStatus"
-    ).textContent =
-        "PAUSED";
+    clearInterval(
+        studyTimer
+    );
 
 }
 
-
-// =====================================================
-// RESET TIMER
-// =====================================================
 
 function resetTimer() {
 
-    clearInterval(
-        timerInterval
-    );
+    pauseTimer();
 
 
-    timerInterval =
-        null;
+    studySeconds =
+        studyTotalSeconds;
 
 
-    studyTimerRunning =
-        false;
-
-
-    if (
-        currentStudyTask
-    ) {
-
-        totalStudySeconds =
-            currentStudyTask.duration *
-            60;
-
-        remainingStudySeconds =
-            totalStudySeconds;
-
-    }
-
-
-    updateTimerDisplay();
-
-
-    updateProgress(
-        0
-    );
-
-
-    const status =
-        document.getElementById(
-            "sessionStatus"
-        );
-
-
-    if (status) {
-
-        status.textContent =
-            "READY";
-
-    }
-
-
-    const task =
-        document.getElementById(
-            "currentTask"
-        );
-
-
-    if (task) {
-
-        task.textContent =
-            currentStudyTask
-                ? getStudyTask(
-                    currentStudyTask.goal
-                )
-                : "Prepare to begin.";
-
-    }
+    updateTimer();
 
 }
 
 
-// =====================================================
-// FINISH STUDY SESSION
-// =====================================================
+function finishSession() {
 
-function finishStudySession() {
-
-    clearInterval(
-        timerInterval
-    );
+    pauseTimer();
 
 
-    timerInterval =
-        null;
-
-
-    studyTimerRunning =
-        false;
-
-
-    remainingStudySeconds =
+    studySeconds =
         0;
 
 
-    updateTimerDisplay();
+    updateTimer();
 
 
-    updateProgress(
-        100
-    );
-
-
-    const status =
-        document.getElementById(
-            "sessionStatus"
-        );
-
-
-    if (status) {
-
-        status.textContent =
-            "COMPLETED";
-
-    }
-
-
-    const task =
-        document.getElementById(
-            "currentTask"
-        );
-
-
-    if (task) {
-
-        task.textContent =
-            "Study session completed. Great work.";
-
-    }
-
-
-    speak(
-        "Study session completed. Great work."
-    );
+    document.getElementById(
+        "currentTask"
+    ).textContent =
+        "Study session completed.";
 
 }
 
 
-// =====================================================
-// TIMER DISPLAY
-// =====================================================
-
-function updateTimerDisplay() {
-
-    const display =
-        document.getElementById(
-            "timerDisplay"
-        );
-
-
-    if (!display) {
-        return;
-    }
-
+function updateTimer() {
 
     const minutes =
         Math.floor(
-            remainingStudySeconds /
-            60
+            studySeconds / 60
         );
-
 
     const seconds =
-        remainingStudySeconds %
-        60;
+        studySeconds % 60;
 
 
-    display.textContent =
+    document.getElementById(
+        "timerDisplay"
+    ).textContent =
         `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
 
-}
 
-
-// =====================================================
-// STUDY PROGRESS
-// =====================================================
-
-function updateProgress(
-    percent
-) {
-
-    const safePercent =
-        Math.max(
-            0,
-            Math.min(
-                100,
-                percent
-            )
-        );
-
-
-    const percentText =
-        document.getElementById(
-            "progressPercent"
-        );
-
-
-    const fill =
-        document.getElementById(
-            "progressFill"
-        );
-
-
-    if (percentText) {
-
-        percentText.textContent =
-            `${Math.round(
-                safePercent
-            )}%`;
-
-    }
-
-
-    if (fill) {
-
-        fill.style.width =
-            `${safePercent}%`;
-
-    }
-
-}
-
-
-// =====================================================
-// UPDATE CURRENT STUDY TASK
-// =====================================================
-
-function updateCurrentStudyTask() {
-
-    if (
-        !currentStudyTask
-    ) {
-
-        return;
-
-    }
-
-
-    const elapsed =
-        totalStudySeconds -
-        remainingStudySeconds;
-
-
-    const elapsedMinutes =
-        Math.floor(
-            elapsed /
-            60
-        );
-
-
-    let taskText;
+    let progress =
+        0;
 
 
     if (
-        elapsedMinutes < 5
+        studyTotalSeconds > 0
     ) {
 
-        taskText =
-            "Review the topic and identify the key concepts.";
-
-    }
-
-    else if (
-        elapsedMinutes < 15
-    ) {
-
-        taskText =
-            "Study and understand the main concepts.";
-
-    }
-
-    else if (
-        elapsedMinutes < 30
-    ) {
-
-        taskText =
-            "Attempt active recall without looking at your notes.";
-
-    }
-
-    else {
-
-        taskText =
-            "Practise questions and check your mistakes.";
+        progress =
+            (
+                (
+                    studyTotalSeconds -
+                    studySeconds
+                ) /
+                studyTotalSeconds
+            ) *
+            100;
 
     }
 
 
-    const task =
-        document.getElementById(
-            "currentTask"
-        );
+    document.getElementById(
+        "progressFill"
+    ).style.width =
+        `${progress}%`;
 
 
-    if (task) {
-
-        task.textContent =
-            taskText;
-
-    }
+    document.getElementById(
+        "progressText"
+    ).textContent =
+        `${Math.round(progress)}%`;
 
 }
 
 
 // =====================================================
-// HOMEWORK MANAGER
+// HOMEWORK
 // =====================================================
 
 function openHomework() {
 
-    const manager =
-        document.getElementById(
-            "homeworkManager"
+    document
+        .getElementById(
+            "homeworkModal"
+        )
+        .classList.add(
+            "active"
         );
-
-
-    if (manager) {
-
-        manager.style.display =
-            "flex";
-
-    }
-
-
-    loadHomework();
 
 }
 
-
-// =====================================================
-// CLOSE HOMEWORK
-// =====================================================
 
 function closeHomework() {
 
-    const manager =
-        document.getElementById(
-            "homeworkManager"
+    document
+        .getElementById(
+            "homeworkModal"
+        )
+        .classList.remove(
+            "active"
         );
-
-
-    if (manager) {
-
-        manager.style.display =
-            "none";
-
-    }
 
 }
 
-
-// =====================================================
-// ADD HOMEWORK
-// =====================================================
 
 function addHomework() {
 
     const subject =
         document.getElementById(
             "homeworkSubject"
-        ).value;
+        ).value.trim();
 
 
     const task =
@@ -1737,9 +1056,9 @@ function addHomework() {
         ).value.trim();
 
 
-    const dueDate =
+    const due =
         document.getElementById(
-            "homeworkDueDate"
+            "homeworkDue"
         ).value;
 
 
@@ -1749,10 +1068,14 @@ function addHomework() {
         ).value;
 
 
-    if (!task) {
+    if (
+        !subject ||
+        !task ||
+        !due
+    ) {
 
         alert(
-            "Please enter a homework task."
+            "Please fill in all homework fields."
         );
 
         return;
@@ -1760,7 +1083,7 @@ function addHomework() {
     }
 
 
-    const newHomework = {
+    homework.push({
 
         id:
             Date.now(),
@@ -1771,8 +1094,8 @@ function addHomework() {
         task:
             task,
 
-        dueDate:
-            dueDate,
+        due:
+            due,
 
         priority:
             priority,
@@ -1780,15 +1103,19 @@ function addHomework() {
         completed:
             false
 
-    };
-
-
-    homework.push(
-        newHomework
-    );
+    });
 
 
     saveHomework();
+
+    renderHomework();
+
+    updateDashboardSummaries();
+
+
+    document.getElementById(
+        "homeworkSubject"
+    ).value = "";
 
 
     document.getElementById(
@@ -1797,23 +1124,11 @@ function addHomework() {
 
 
     document.getElementById(
-        "homeworkDueDate"
+        "homeworkDue"
     ).value = "";
-
-
-    loadHomework();
-
-
-    showResponse(
-        `Homework added: ${task}`
-    );
 
 }
 
-
-// =====================================================
-// SAVE HOMEWORK
-// =====================================================
 
 function saveHomework() {
 
@@ -1827,11 +1142,7 @@ function saveHomework() {
 }
 
 
-// =====================================================
-// LOAD HOMEWORK
-// =====================================================
-
-function loadHomework() {
+function renderHomework() {
 
     const list =
         document.getElementById(
@@ -1839,27 +1150,15 @@ function loadHomework() {
         );
 
 
-    if (!list) {
-        return;
-    }
+    if (!list) return;
 
 
     if (
         homework.length === 0
     ) {
 
-        list.innerHTML = `
-
-            <div class="empty-homework">
-
-                No homework tasks yet.
-
-            </div>
-
-        `;
-
-
-        updateHomeworkSummary();
+        list.innerHTML =
+            "<p>No homework yet.</p>";
 
         return;
 
@@ -1869,135 +1168,73 @@ function loadHomework() {
     list.innerHTML =
         homework
             .map(
-                item =>
-                    createHomeworkHTML(
-                        item
-                    )
-            )
-            .join("");
+                item => `
 
+                <div class="homework-item">
 
-    updateHomeworkSummary();
-
-}
-
-
-// =====================================================
-// CREATE HOMEWORK HTML
-// =====================================================
-
-function createHomeworkHTML(
-    item
-) {
-
-    const completedClass =
-        item.completed
-            ? "completed"
-            : "";
-
-
-    const checked =
-        item.completed
-            ? "checked"
-            : "";
-
-
-    const dueText =
-        item.dueDate
-            ? formatDate(
-                item.dueDate
-            )
-            : "No due date";
-
-
-    return `
-
-        <div
-            class="homework-item ${completedClass}"
-        >
-
-            <div class="homework-item-main">
-
-                <label class="homework-check">
-
-                    <input
-                        type="checkbox"
-                        ${checked}
-                        onchange="toggleHomework(${item.id})"
+                    <div
+                        class="${
+                            item.completed
+                                ? "completed"
+                                : ""
+                        }"
                     >
 
-                    <span></span>
+                        <div class="item-title">
+                            ${escapeHTML(item.subject)}
+                        </div>
 
-                </label>
+                        <div class="item-meta">
+                            ${escapeHTML(item.task)}
+                        </div>
+
+                        <div class="item-meta">
+                            Due: ${item.due}
+                            · Priority: ${item.priority}
+                        </div>
+
+                    </div>
 
 
-                <div class="homework-item-info">
+                    <div class="item-actions">
 
-                    <strong>
-                        ${formatText(item.task)}
-                    </strong>
+                        <button
+                            onclick="toggleHomework(${item.id})"
+                        >
+                            ${
+                                item.completed
+                                    ? "UNDO"
+                                    : "DONE"
+                            }
+                        </button>
 
-                    <span>
-                        ${formatText(item.subject)}
-                    </span>
 
-                    <span>
-                        Due: ${dueText}
-                    </span>
+                        <button
+                            onclick="deleteHomework(${item.id})"
+                        >
+                            DELETE
+                        </button>
+
+                    </div>
 
                 </div>
 
-            </div>
-
-
-            <div class="homework-item-side">
-
-                <span
-                    class="homework-priority ${item.priority.toLowerCase()}"
-                >
-
-                    ${item.priority}
-
-                </span>
-
-
-                <button
-                    onclick="deleteHomework(${item.id})"
-                    class="delete-homework"
-                    title="Delete homework"
-                >
-
-                    ×
-
-                </button>
-
-            </div>
-
-        </div>
-
-    `;
+            `
+            )
+            .join("");
 
 }
 
 
-// =====================================================
-// TOGGLE HOMEWORK
-// =====================================================
-
-function toggleHomework(
-    id
-) {
+function toggleHomework(id) {
 
     const item =
         homework.find(
-            homeworkItem =>
-                homeworkItem.id === id
+            h => h.id === id
         );
 
 
-    if (!item) {
-        return;
-    }
+    if (!item) return;
 
 
     item.completed =
@@ -2006,149 +1243,43 @@ function toggleHomework(
 
     saveHomework();
 
-    loadHomework();
+    renderHomework();
+
+    updateDashboardSummaries();
 
 }
 
 
-// =====================================================
-// DELETE HOMEWORK
-// =====================================================
-
-function deleteHomework(
-    id
-) {
+function deleteHomework(id) {
 
     homework =
         homework.filter(
-            item =>
-                item.id !== id
+            h => h.id !== id
         );
 
 
     saveHomework();
 
-    loadHomework();
+    renderHomework();
+
+    updateDashboardSummaries();
 
 }
 
-
-// =====================================================
-// CLEAR COMPLETED HOMEWORK
-// =====================================================
 
 function clearCompletedHomework() {
 
     homework =
         homework.filter(
-            item =>
-                !item.completed
+            h => !h.completed
         );
 
 
     saveHomework();
 
-    loadHomework();
+    renderHomework();
 
-}
-
-
-// =====================================================
-// HOMEWORK SUMMARY
-// =====================================================
-
-function updateHomeworkSummary() {
-
-    const count =
-        document.getElementById(
-            "homeworkCount"
-        );
-
-
-    const status =
-        document.getElementById(
-            "homeworkStatus"
-        );
-
-
-    const incomplete =
-        homework.filter(
-            item =>
-                !item.completed
-        ).length;
-
-
-    if (count) {
-
-        count.textContent =
-            incomplete;
-
-    }
-
-
-    if (!status) {
-        return;
-    }
-
-
-    if (
-        homework.length === 0
-    ) {
-
-        status.textContent =
-            "No homework added yet.";
-
-    }
-
-    else if (
-        incomplete === 0
-    ) {
-
-        status.textContent =
-            "All homework completed.";
-
-    }
-
-    else {
-
-        status.textContent =
-            `${incomplete} homework task${incomplete === 1 ? "" : "s"} remaining.`;
-
-    }
-
-}
-
-
-// =====================================================
-// FORMAT DATE
-// =====================================================
-
-function formatDate(
-    dateString
-) {
-
-    if (!dateString) {
-
-        return "No due date";
-
-    }
-
-
-    const date =
-        new Date(
-            dateString +
-            "T00:00:00"
-        );
-
-
-    return date.toLocaleDateString(
-        "en-SG",
-        {
-            day: "numeric",
-            month: "short",
-            year: "numeric"
-        }
-    );
+    updateDashboardSummaries();
 
 }
 
@@ -2159,10 +1290,204 @@ function formatDate(
 
 function openSchedule() {
 
-    alert(
-        "JARVIS SCHEDULE SYSTEM\n\n" +
-        "Calendar integration is coming soon."
+    document
+        .getElementById(
+            "scheduleModal"
+        )
+        .classList.add(
+            "active"
+        );
+
+
+    renderSchedule();
+
+}
+
+
+function closeSchedule() {
+
+    document
+        .getElementById(
+            "scheduleModal"
+        )
+        .classList.remove(
+            "active"
+        );
+
+}
+
+
+function addScheduleEvent() {
+
+    const eventName =
+        document.getElementById(
+            "scheduleEvent"
+        ).value.trim();
+
+
+    const date =
+        document.getElementById(
+            "scheduleDate"
+        ).value;
+
+
+    const time =
+        document.getElementById(
+            "scheduleTime"
+        ).value;
+
+
+    const type =
+        document.getElementById(
+            "scheduleType"
+        ).value;
+
+
+    if (
+        !eventName ||
+        !date ||
+        !time
+    ) {
+
+        alert(
+            "Please fill in the event, date and time."
+        );
+
+        return;
+
+    }
+
+
+    schedule.push({
+
+        id:
+            Date.now(),
+
+        event:
+            eventName,
+
+        date:
+            date,
+
+        time:
+            time,
+
+        type:
+            type
+
+    });
+
+
+    saveSchedule();
+
+    renderSchedule();
+
+    updateDashboardSummaries();
+
+
+    document.getElementById(
+        "scheduleEvent"
+    ).value = "";
+
+}
+
+
+function saveSchedule() {
+
+    localStorage.setItem(
+        "jarvisSchedule",
+        JSON.stringify(
+            schedule
+        )
     );
+
+}
+
+
+function renderSchedule() {
+
+    const list =
+        document.getElementById(
+            "scheduleList"
+        );
+
+
+    if (!list) return;
+
+
+    if (
+        schedule.length === 0
+    ) {
+
+        list.innerHTML =
+            "<p>No scheduled events.</p>";
+
+        return;
+
+    }
+
+
+    const sorted =
+        [...schedule].sort(
+            (a, b) =>
+                (
+                    `${a.date} ${a.time}`
+                ).localeCompare(
+                    `${b.date} ${b.time}`
+                )
+        );
+
+
+    list.innerHTML =
+        sorted
+            .map(
+                item => `
+
+                <div class="schedule-item">
+
+                    <div class="item-title">
+                        ${escapeHTML(item.event)}
+                    </div>
+
+                    <div class="item-meta">
+                        ${item.date}
+                        · ${item.time}
+                        · ${escapeHTML(item.type)}
+                    </div>
+
+                    <div class="item-actions">
+
+                        <button
+                            onclick="deleteSchedule(${item.id})"
+                        >
+                            DELETE
+                        </button>
+
+                    </div>
+
+                </div>
+
+            `
+            )
+            .join("");
+
+}
+
+
+function deleteSchedule(id) {
+
+    schedule =
+        schedule.filter(
+            event =>
+                event.id !== id
+        );
+
+
+    saveSchedule();
+
+    renderSchedule();
+
+    updateDashboardSummaries();
 
 }
 
@@ -2173,50 +1498,451 @@ function openSchedule() {
 
 function openTests() {
 
-    alert(
-        "JARVIS TEST & EXAM SYSTEM\n\n" +
-        "Test scheduling is coming soon."
+    document
+        .getElementById(
+            "testsModal"
+        )
+        .classList.add(
+            "active"
+        );
+
+
+    renderTests();
+
+}
+
+
+function closeTests() {
+
+    document
+        .getElementById(
+            "testsModal"
+        )
+        .classList.remove(
+            "active"
+        );
+
+}
+
+
+function addTest() {
+
+    const subject =
+        document.getElementById(
+            "testSubject"
+        ).value.trim();
+
+
+    const name =
+        document.getElementById(
+            "testName"
+        ).value.trim();
+
+
+    const date =
+        document.getElementById(
+            "testDate"
+        ).value;
+
+
+    const topics =
+        document.getElementById(
+            "testTopics"
+        ).value.trim();
+
+
+    if (
+        !subject ||
+        !name ||
+        !date
+    ) {
+
+        alert(
+            "Please fill in the subject, test name and date."
+        );
+
+        return;
+
+    }
+
+
+    tests.push({
+
+        id:
+            Date.now(),
+
+        subject:
+            subject,
+
+        name:
+            name,
+
+        date:
+            date,
+
+        topics:
+            topics
+
+    });
+
+
+    saveTests();
+
+    renderTests();
+
+    updateDashboardSummaries();
+
+
+    document.getElementById(
+        "testSubject"
+    ).value = "";
+
+
+    document.getElementById(
+        "testName"
+    ).value = "";
+
+
+    document.getElementById(
+        "testDate"
+    ).value = "";
+
+
+    document.getElementById(
+        "testTopics"
+    ).value = "";
+
+}
+
+
+function saveTests() {
+
+    localStorage.setItem(
+        "jarvisTests",
+        JSON.stringify(
+            tests
+        )
+    );
+
+}
+
+
+function renderTests() {
+
+    const list =
+        document.getElementById(
+            "testList"
+        );
+
+
+    if (!list) return;
+
+
+    if (
+        tests.length === 0
+    ) {
+
+        list.innerHTML =
+            "<p>No tests scheduled.</p>";
+
+        return;
+
+    }
+
+
+    const sorted =
+        [...tests].sort(
+            (a, b) =>
+                a.date.localeCompare(
+                    b.date
+                )
+        );
+
+
+    list.innerHTML =
+        sorted
+            .map(
+                item => {
+
+                    const days =
+                        daysUntil(
+                            item.date
+                        );
+
+
+                    let countdown;
+
+
+                    if (days < 0) {
+
+                        countdown =
+                            "Completed";
+
+                    } else if (
+                        days === 0
+                    ) {
+
+                        countdown =
+                            "TODAY";
+
+                    } else if (
+                        days === 1
+                    ) {
+
+                        countdown =
+                            "Tomorrow";
+
+                    } else {
+
+                        countdown =
+                            `${days} days remaining`;
+
+                    }
+
+
+                    return `
+
+                    <div class="test-item">
+
+                        <div class="item-title">
+                            ${escapeHTML(item.subject)}
+                            — ${escapeHTML(item.name)}
+                        </div>
+
+                        <div class="item-meta">
+                            Date: ${item.date}
+                        </div>
+
+                        <div class="item-meta">
+                            ${escapeHTML(item.topics || "No topics added")}
+                        </div>
+
+                        <div class="item-meta">
+                            ${countdown}
+                        </div>
+
+                        <div class="item-actions">
+
+                            <button
+                                onclick="deleteTest(${item.id})"
+                            >
+                                DELETE
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                    `;
+
+                }
+            )
+            .join("");
+
+}
+
+
+function deleteTest(id) {
+
+    tests =
+        tests.filter(
+            test =>
+                test.id !== id
+        );
+
+
+    saveTests();
+
+    renderTests();
+
+    updateDashboardSummaries();
+
+}
+
+
+function daysUntil(dateString) {
+
+    const today =
+        new Date();
+
+
+    today.setHours(
+        0,
+        0,
+        0,
+        0
+    );
+
+
+    const target =
+        new Date(
+            dateString +
+            "T00:00:00"
+        );
+
+
+    const difference =
+        target - today;
+
+
+    return Math.ceil(
+        difference /
+        (1000 * 60 * 60 * 24)
     );
 
 }
 
 
 // =====================================================
-// CLOSE MODALS WHEN CLICKING OUTSIDE
+// DASHBOARD SUMMARIES
 // =====================================================
 
-document.addEventListener(
-    "click",
-    (event) => {
+function updateDashboardSummaries() {
 
-        const studyHub =
-            document.getElementById(
-                "studyHub"
-            );
+    const homeworkSummary =
+        document.getElementById(
+            "homeworkSummary"
+        );
 
 
-        const homeworkManager =
-            document.getElementById(
-                "homeworkManager"
-            );
+    const scheduleSummary =
+        document.getElementById(
+            "scheduleSummary"
+        );
 
+
+    const testSummary =
+        document.getElementById(
+            "testSummary"
+        );
+
+
+    if (homeworkSummary) {
+
+        const incomplete =
+            homework.filter(
+                item =>
+                    !item.completed
+            ).length;
+
+
+        homeworkSummary.textContent =
+            incomplete === 0
+                ? "No incomplete homework."
+                : `${incomplete} homework task${incomplete === 1 ? "" : "s"} remaining.`;
+
+    }
+
+
+    if (scheduleSummary) {
+
+        scheduleSummary.textContent =
+            schedule.length === 0
+                ? "No events scheduled."
+                : `${schedule.length} event${schedule.length === 1 ? "" : "s"} scheduled.`;
+
+    }
+
+
+    if (testSummary) {
 
         if (
-            event.target ===
-            studyHub
+            tests.length === 0
         ) {
 
-            closeStudyHub();
+            testSummary.textContent =
+                "No tests scheduled.";
+
+        } else {
+
+            const upcoming =
+                tests
+                    .filter(
+                        test =>
+                            daysUntil(
+                                test.date
+                            ) >= 0
+                    )
+                    .sort(
+                        (a, b) =>
+                            a.date.localeCompare(
+                                b.date
+                            )
+                    )[0];
+
+
+            if (upcoming) {
+
+                testSummary.textContent =
+                    `${upcoming.subject}: ${daysUntil(upcoming.date)} day${daysUntil(upcoming.date) === 1 ? "" : "s"} remaining.`;
+
+            } else {
+
+                testSummary.textContent =
+                    "No upcoming tests.";
+
+            }
 
         }
 
+    }
+
+}
+
+
+// =====================================================
+// UTILITIES
+// =====================================================
+
+function escapeHTML(value) {
+
+    return String(value)
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+// =====================================================
+// MODAL CLICK OUTSIDE
+// =====================================================
+
+window.addEventListener(
+    "click",
+    event => {
 
         if (
-            event.target ===
-            homeworkManager
+            event.target.classList.contains(
+                "modal"
+            )
         ) {
 
-            closeHomework();
+            event.target.classList.remove(
+                "active"
+            );
 
         }
 
