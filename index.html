@@ -22,18 +22,14 @@
 
 <body>
 
-    <!-- ========================================= -->
-    <!-- BACKGROUND -->
-    <!-- ========================================= -->
-
     <div class="background-grid"></div>
 
     <div class="scan-line"></div>
 
 
-    <!-- ========================================= -->
-    <!-- HEADER -->
-    <!-- ========================================= -->
+    <!-- =================================================
+         HEADER
+         ================================================= -->
 
     <header>
 
@@ -61,16 +57,17 @@
     </header>
 
 
-    <!-- ========================================= -->
-    <!-- MAIN -->
-    <!-- ========================================= -->
+
+    <!-- =================================================
+         MAIN
+         ================================================= -->
 
     <main>
 
 
-        <!-- ===================================== -->
-        <!-- CENTRAL JARVIS PANEL -->
-        <!-- ===================================== -->
+        <!-- =================================================
+             CENTRAL JARVIS PANEL
+             ================================================= -->
 
         <section class="main-panel">
 
@@ -105,8 +102,6 @@
             </div>
 
 
-            <!-- STATUS -->
-
             <div class="ready">
 
                 <span class="status-indicator">
@@ -118,7 +113,12 @@
             </div>
 
 
-            <!-- COMMAND AREA -->
+
+            <!-- =================================================
+                 COMMAND AREA
+                 Voice button removed.
+                 Automatic voice will be handled by script.js.
+                 ================================================= -->
 
             <div class="command-area">
 
@@ -139,21 +139,13 @@
 
                 </button>
 
-
-                <button
-                    onclick="startListening()"
-                    class="voice-button"
-                    title="Voice command"
-                >
-
-                    🎙
-
-                </button>
-
             </div>
 
 
-            <!-- RESPONSE -->
+
+            <!-- =================================================
+                 AI RESPONSE
+                 ================================================= -->
 
             <div
                 id="response"
@@ -165,7 +157,7 @@
                 </span>
 
                 <span class="response-text">
-                    Awaiting your command...
+                    Initialising JARVIS...
                 </span>
 
             </div>
@@ -174,14 +166,16 @@
 
 
 
-        <!-- ===================================== -->
-        <!-- DASHBOARD -->
-        <!-- ===================================== -->
+        <!-- =================================================
+             DASHBOARD
+             ================================================= -->
 
         <section class="dashboard">
 
 
-            <!-- SYSTEM -->
+            <!-- =================================================
+                 SYSTEM
+                 ================================================= -->
 
             <div class="panel system-panel">
 
@@ -233,7 +227,7 @@
                         </span>
 
                         <strong>
-                            READY
+                            AUTO
                         </strong>
 
                     </div>
@@ -244,7 +238,9 @@
 
 
 
-            <!-- SCHEDULE -->
+            <!-- =================================================
+                 SCHEDULE
+                 ================================================= -->
 
             <div class="panel">
 
@@ -278,7 +274,9 @@
 
 
 
-            <!-- STUDY HUB -->
+            <!-- =================================================
+                 STUDY HUB
+                 ================================================= -->
 
             <div class="panel study-panel">
 
@@ -312,9 +310,11 @@
 
 
 
-            <!-- HOMEWORK -->
+            <!-- =================================================
+                 HOMEWORK
+                 ================================================= -->
 
-            <div class="panel">
+            <div class="panel homework-panel">
 
                 <div class="panel-header">
 
@@ -329,8 +329,26 @@
                 </div>
 
 
-                <p>
-                    No tasks loaded.
+                <div
+                    id="homeworkSummary"
+                    class="homework-summary"
+                >
+
+                    <strong id="homeworkCount">
+                        0
+                    </strong>
+
+                    <span>
+                        TASKS
+                    </span>
+
+                </div>
+
+
+                <p id="homeworkStatus">
+
+                    No homework added yet.
+
                 </p>
 
 
@@ -338,7 +356,7 @@
                     onclick="openHomework()"
                 >
 
-                    VIEW HOMEWORK
+                    OPEN HOMEWORK MANAGER
 
                 </button>
 
@@ -346,7 +364,9 @@
 
 
 
-            <!-- TESTS -->
+            <!-- =================================================
+                 TESTS & EXAMS
+                 ================================================= -->
 
             <div class="panel">
 
@@ -380,7 +400,9 @@
 
 
 
-            <!-- MEMORY -->
+            <!-- =================================================
+                 MEMORY
+                 ================================================= -->
 
             <div class="panel memory-panel">
 
@@ -416,9 +438,9 @@
 
 
 
-        <!-- ===================================== -->
-        <!-- STUDY HUB -->
-        <!-- ===================================== -->
+        <!-- =================================================
+             STUDY HUB
+             ================================================= -->
 
         <section
             id="studyHub"
@@ -428,7 +450,7 @@
             <div class="study-hub-box">
 
 
-                <!-- HEADER -->
+                <!-- STUDY HEADER -->
 
                 <div class="study-hub-header">
 
@@ -455,6 +477,7 @@
                     </button>
 
                 </div>
+
 
 
                 <p class="study-description">
@@ -617,7 +640,7 @@
 
 
 
-                <!-- AI RESULT -->
+                <!-- STUDY RESULT -->
 
                 <div
                     id="studyResult"
@@ -636,9 +659,9 @@
 
 
 
-                <!-- ================================= -->
-                <!-- ACTIVE SESSION -->
-                <!-- ================================= -->
+                <!-- =================================================
+                     ACTIVE STUDY SESSION
+                     ================================================= -->
 
                 <div
                     id="activeStudySession"
@@ -692,9 +715,7 @@
                         </div>
 
 
-                        <div
-                            class="timer-label"
-                        >
+                        <div class="timer-label">
 
                             REMAINING
 
@@ -745,9 +766,7 @@
                         </div>
 
 
-                        <div
-                            id="currentTask"
-                        >
+                        <div id="currentTask">
 
                             Prepare to begin.
 
@@ -806,13 +825,256 @@
 
         </section>
 
+
+
+        <!-- =================================================
+             HOMEWORK MANAGER
+             ================================================= -->
+
+        <section
+            id="homeworkManager"
+            class="homework-manager"
+        >
+
+            <div class="homework-manager-box">
+
+
+                <!-- HEADER -->
+
+                <div class="homework-manager-header">
+
+                    <div>
+
+                        <div class="small-text">
+                            J.A.R.V.I.S.
+                        </div>
+
+                        <h2>
+                            HOMEWORK MANAGER
+                        </h2>
+
+                    </div>
+
+
+                    <button
+                        onclick="closeHomework()"
+                        class="close-button"
+                    >
+
+                        ×
+
+                    </button>
+
+                </div>
+
+
+
+                <p class="homework-description">
+
+                    Organise your assignments, track deadlines
+                    and stay on top of your schoolwork.
+
+                </p>
+
+
+
+                <!-- =================================================
+                     ADD HOMEWORK
+                     ================================================= -->
+
+                <div class="homework-add-section">
+
+                    <div class="response-label">
+                        ADD HOMEWORK
+                    </div>
+
+
+
+                    <!-- SUBJECT -->
+
+                    <div class="homework-field">
+
+                        <label for="homeworkSubject">
+                            SUBJECT
+                        </label>
+
+
+                        <select id="homeworkSubject">
+
+                            <option value="Physics">
+                                Physics
+                            </option>
+
+                            <option value="Chemistry">
+                                Chemistry
+                            </option>
+
+                            <option value="Mathematics">
+                                Mathematics
+                            </option>
+
+                            <option value="Social Studies">
+                                Social Studies
+                            </option>
+
+                            <option value="English">
+                                English
+                            </option>
+
+                            <option value="Tamil">
+                                Tamil
+                            </option>
+
+                            <option value="Other">
+                                Other
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+
+                    <!-- TASK -->
+
+                    <div class="homework-field">
+
+                        <label for="homeworkTask">
+                            HOMEWORK TASK
+                        </label>
+
+
+                        <input
+                            id="homeworkTask"
+                            type="text"
+                            placeholder="e.g. Complete Physics worksheet"
+                        >
+
+                    </div>
+
+
+
+                    <!-- DATE + PRIORITY -->
+
+                    <div class="homework-row">
+
+
+                        <div class="homework-field">
+
+                            <label for="homeworkDueDate">
+                                DUE DATE
+                            </label>
+
+
+                            <input
+                                id="homeworkDueDate"
+                                type="date"
+                            >
+
+                        </div>
+
+
+
+                        <div class="homework-field">
+
+                            <label for="homeworkPriority">
+                                PRIORITY
+                            </label>
+
+
+                            <select id="homeworkPriority">
+
+                                <option value="Low">
+                                    Low
+                                </option>
+
+                                <option
+                                    value="Medium"
+                                    selected
+                                >
+                                    Medium
+                                </option>
+
+                                <option value="High">
+                                    High
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- ADD BUTTON -->
+
+                    <button
+                        onclick="addHomework()"
+                        class="homework-add-button"
+                    >
+
+                        + ADD HOMEWORK
+
+                    </button>
+
+                </div>
+
+
+
+                <!-- =================================================
+                     HOMEWORK LIST
+                     ================================================= -->
+
+                <div class="homework-list-section">
+
+
+                    <div class="homework-list-header">
+
+                        <div class="response-label">
+                            YOUR HOMEWORK
+                        </div>
+
+
+                        <button
+                            onclick="clearCompletedHomework()"
+                            class="small-action-button"
+                        >
+
+                            CLEAR COMPLETED
+
+                        </button>
+
+                    </div>
+
+
+
+                    <div
+                        id="homeworkList"
+                        class="homework-list"
+                    >
+
+                        <div class="empty-homework">
+
+                            No homework tasks yet.
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
     </main>
 
 
 
-    <!-- ========================================= -->
-    <!-- FOOTER -->
-    <!-- ========================================= -->
+    <!-- =================================================
+         FOOTER
+         ================================================= -->
 
     <footer>
 
@@ -824,15 +1086,15 @@
 
         <span>•</span>
 
-        PROTOTYPE 7
+        PROTOTYPE 8
 
     </footer>
 
 
 
-    <!-- ========================================= -->
-    <!-- JAVASCRIPT -->
-    <!-- ========================================= -->
+    <!-- =================================================
+         JAVASCRIPT
+         ================================================= -->
 
     <script src="script.js"></script>
 
