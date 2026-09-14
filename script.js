@@ -1,23 +1,95 @@
 function sendCommand() {
 
     const input = document.getElementById("commandInput");
-
-    const command = input.value.trim();
+    const command = input.value.trim().toLowerCase();
 
     const response = document.getElementById("response");
 
-
     if (command === "") {
+        response.innerText = "JARVIS: Please give me a command.";
+        return;
+    }
+
+
+    // SCHEDULE
+    if (
+        command.includes("schedule") ||
+        command.includes("calendar") ||
+        command.includes("what do i have today") ||
+        command.includes("what's on today")
+    ) {
 
         response.innerText =
-            "JARVIS: Please give me a command.";
+            "JARVIS: Accessing your schedule. Google Calendar integration is not connected yet.";
 
         return;
     }
 
 
+    // STUDY
+    if (
+        command.includes("study") ||
+        command.includes("revise") ||
+        command.includes("revision") ||
+        command.includes("physics") ||
+        command.includes("chemistry") ||
+        command.includes("math")
+    ) {
+
+        response.innerText =
+            "JARVIS: Study mode detected. I can help you plan your revision once your study data is connected.";
+
+        return;
+    }
+
+
+    // DOCUMENTS
+    if (
+        command.includes("notes") ||
+        command.includes("document") ||
+        command.includes("docs") ||
+        command.includes("find my")
+    ) {
+
+        response.innerText =
+            "JARVIS: Document search detected. Google Drive integration will be connected later.";
+
+        return;
+    }
+
+
+    // HOMEWORK
+    if (
+        command.includes("homework") ||
+        command.includes("assignment") ||
+        command.includes("assignments")
+    ) {
+
+        response.innerText =
+            "JARVIS: Homework system detected. Your task database has not been connected yet.";
+
+        return;
+    }
+
+
+    // TESTS
+    if (
+        command.includes("test") ||
+        command.includes("tests") ||
+        command.includes("exam") ||
+        command.includes("exams")
+    ) {
+
+        response.innerText =
+            "JARVIS: Test and examination system detected. I will need your test data to provide your schedule.";
+
+        return;
+    }
+
+
+    // UNKNOWN COMMAND
     response.innerText =
-        "JARVIS: Command received — " + command;
+        "JARVIS: I understood your command, but I don't have the required system connected yet.";
 
 
     input.value = "";
@@ -29,7 +101,7 @@ function startListening() {
     const response = document.getElementById("response");
 
     response.innerText =
-        "JARVIS: Voice interface will be activated in the next stage.";
+        "JARVIS: Voice interface will be activated soon.";
 
 }
 
@@ -39,7 +111,7 @@ function openSchedule() {
     const response = document.getElementById("response");
 
     response.innerText =
-        "JARVIS: Calendar system is currently offline. Google Calendar integration will be added later.";
+        "JARVIS: Calendar system detected. Google Calendar integration is coming next.";
 
 }
 
@@ -49,6 +121,6 @@ function startStudy() {
     const response = document.getElementById("response");
 
     response.innerText =
-        "JARVIS: Study Hub is ready for development.";
+        "JARVIS: Study Hub activated.";
 
 }
