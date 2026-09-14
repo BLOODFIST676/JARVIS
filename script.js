@@ -12,7 +12,10 @@ function sendCommand() {
     }
 
 
+    // =========================
     // SCHEDULE
+    // =========================
+
     if (
         command.includes("schedule") ||
         command.includes("calendar") ||
@@ -24,12 +27,16 @@ function sendCommand() {
             "JARVIS: Accessing your schedule. Google Calendar integration is not connected yet.";
 
         speak(response.innerText);
+
         input.value = "";
         return;
     }
 
 
+    // =========================
     // STUDY
+    // =========================
+
     if (
         command.includes("study") ||
         command.includes("revise") ||
@@ -43,12 +50,16 @@ function sendCommand() {
             "JARVIS: Study mode detected. I can help you plan your revision once your study data is connected.";
 
         speak(response.innerText);
+
         input.value = "";
         return;
     }
 
 
+    // =========================
     // DOCUMENTS
+    // =========================
+
     if (
         command.includes("notes") ||
         command.includes("document") ||
@@ -60,12 +71,16 @@ function sendCommand() {
             "JARVIS: Document search detected. Google Drive integration will be connected later.";
 
         speak(response.innerText);
+
         input.value = "";
         return;
     }
 
 
+    // =========================
     // HOMEWORK
+    // =========================
+
     if (
         command.includes("homework") ||
         command.includes("assignment") ||
@@ -76,12 +91,16 @@ function sendCommand() {
             "JARVIS: Homework system detected. Your task database has not been connected yet.";
 
         speak(response.innerText);
+
         input.value = "";
         return;
     }
 
 
-    // TESTS
+    // =========================
+    // TESTS / EXAMS
+    // =========================
+
     if (
         command.includes("test") ||
         command.includes("tests") ||
@@ -93,29 +112,104 @@ function sendCommand() {
             "JARVIS: Test and examination system detected. I will need your test data to provide your schedule.";
 
         speak(response.innerText);
+
         input.value = "";
         return;
     }
 
 
-    // UNKNOWN COMMAND
-    response.innerText =
-        "JARVIS: I understood your command, but I don't have the required system connected yet.";
+    // =========================
+    // AI COMMAND
+    // =========================
 
-    speak(response.innerText);
+    askJARVIS(command);
 
     input.value = "";
 }
 
 
-// ================================
+// =========================
+// CONNECT TO JARVIS AI
+// =========================
+
+async function askJARVIS(message) {
+
+    const response = document.getElementById("response");
+
+    response.innerText =
+        "JARVIS: Thinking...";
+
+    speak(response.innerText);
+
+
+    try {
+
+        const result = await fetch(
+            "https://jarvis-ai.tvisha-sanish.workers.dev/",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    message: message
+                })
+            }
+        );
+
+
+        const data = await result.json();
+
+
+        if (!result.ok) {
+
+            throw new Error(
+                data.error || "Request failed"
+            );
+
+        }
+
+
+        response.innerText =
+            "JARVIS: " + data.response;
+
+
+        speak(response.innerText);
+
+
+    } catch (error) {
+
+        console.error(
+            "JARVIS connection error:",
+            error
+        );
+
+
+        response.innerText =
+            "JARVIS: I'm having trouble connecting to my AI system.";
+
+
+        speak(response.innerText);
+
+    }
+
+}
+
+
+// =========================
 // VOICE RECOGNITION
-// ================================
+// =========================
 
 function startListening() {
 
-    const response = document.getElementById("response");
-    const input = document.getElementById("commandInput");
+    const response =
+        document.getElementById("response");
+
+    const input =
+        document.getElementById("commandInput");
+
 
     if (!("webkitSpeechRecognition" in window)) {
 
@@ -123,100 +217,139 @@ function startListening() {
             "JARVIS: Voice recognition is not supported by this browser.";
 
         speak(response.innerText);
+
         return;
     }
 
-    const recognition = new webkitSpeechRecognition();
 
-    recognition.lang = "en-SG";
-    recognition.continuous = false;
-    recognition.interimResults = false;
+    const recognition =
+        new webkitSpeechRecognition();
+
+
+    recognition.lang =
+        "en-SG";
+
+    recognition.continuous =
+        false;
+
+    recognition.interimResults =
+        false;
+
 
     response.innerText =
         "JARVIS: Listening...";
 
-    speak("JARVIS: Listening...");
+    speak(response.innerText);
+
 
     recognition.start();
 
 
-    recognition.onresult = function(event) {
+    recognition.onresult =
+        function(event) {
 
-        const transcript =
-            event.results[0][0].transcript;
-
-        input.value = transcript;
-
-        response.innerText =
-            "JARVIS: Command received. Processing...";
-
-        sendCommand();
-    };
+            const transcript =
+                event.results[0][0].transcript;
 
 
-    recognition.onerror = function() {
-
-        response.innerText =
-            "JARVIS: I couldn't hear that. Please try again.";
-
-        speak(response.innerText);
-
-    };
+            input.value =
+                transcript;
 
 
-    recognition.onend = function() {
+            response.innerText =
+                "JARVIS: Command received. Processing...";
 
-        console.log("Voice recognition ended.");
 
-    };
+            sendCommand();
+
+        };
+
+
+    recognition.onerror =
+        function() {
+
+            response.innerText =
+                "JARVIS: I couldn't hear that. Please try again.";
+
+            speak(response.innerText);
+
+        };
+
+
+    recognition.onend =
+        function() {
+
+            console.log(
+                "Voice recognition ended."
+            );
+
+        };
 
 }
 
 
-// ================================
-// TEXT TO SPEECH
-// ================================
-
-function speak(text) {
-
-    const speech = new SpeechSynthesisUtterance(text);
-
-    speech.rate = 1;
-    speech.pitch = 1;
-    speech.volume = 1;
-
-    window.speechSynthesis.cancel();
-
-    window.speechSynthesis.speak(speech);
-}
-
-
-// ================================
-// SCHEDULE
-// ================================
+// =========================
+// SCHEDULE BUTTON
+// =========================
 
 function openSchedule() {
 
-    const response = document.getElementById("response");
+    const response =
+        document.getElementById("response");
+
 
     response.innerText =
         "JARVIS: Calendar system detected. Google Calendar integration is coming next.";
 
+
     speak(response.innerText);
+
 }
 
 
-// ================================
-// STUDY HUB
-// ================================
+// =========================
+// STUDY BUTTON
+// =========================
 
 function startStudy() {
 
-    const response = document.getElementById("response");
+    const response =
+        document.getElementById("response");
+
 
     response.innerText =
         "JARVIS: Study Hub activated.";
 
+
     speak(response.innerText);
+
 }
-```
+
+
+// =========================
+// TEXT TO SPEECH
+// =========================
+
+function speak(text) {
+
+    const speech =
+        new SpeechSynthesisUtterance(text);
+
+
+    speech.rate =
+        1;
+
+    speech.pitch =
+        1;
+
+    speech.volume =
+        1;
+
+
+    window.speechSynthesis.cancel();
+
+    window.speechSynthesis.speak(
+        speech
+    );
+
+}
