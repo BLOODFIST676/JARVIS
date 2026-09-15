@@ -166,7 +166,7 @@ async function sendCommand() {
 
             throw new Error(
                 data.error ||
-                "Worker returned an error."
+                `Worker returned HTTP ${response.status}.`
             );
 
         }
@@ -251,15 +251,17 @@ async function sendCommand() {
         );
 
 
+        // SHOW THE REAL ERROR
+        // INSTEAD OF THE OLD GENERIC MESSAGE
+
         showResponse(
-            "AI connection failed.\n\n" +
-            "JARVIS could not connect to the AI server.\n\n" +
-            "Please check that the Cloudflare Worker is deployed and that the OPENAI_API_KEY secret is configured."
+            "JARVIS ERROR\n\n" +
+            error.message
         );
 
 
         setAIStatus(
-            "OFFLINE"
+            "ERROR"
         );
 
     }
@@ -361,17 +363,20 @@ function detectMemory(message) {
             ""
         );
 
+
     memory =
         memory.replace(
             /remember my/i,
             ""
         );
 
+
     memory =
         memory.replace(
             /don't forget/i,
             ""
         );
+
 
     memory =
         memory.replace(
@@ -511,12 +516,14 @@ function deleteMemory(index) {
         1
     );
 
+
     localStorage.setItem(
         "jarvisMemory",
         JSON.stringify(
             jarvisMemory
         )
     );
+
 
     updateMemoryCount();
 
@@ -529,12 +536,14 @@ function clearMemory() {
 
     jarvisMemory = [];
 
+
     localStorage.setItem(
         "jarvisMemory",
         JSON.stringify(
             jarvisMemory
         )
     );
+
 
     updateMemoryCount();
 
@@ -577,8 +586,10 @@ function initialiseVoice() {
     recognition.continuous =
         true;
 
+
     recognition.interimResults =
         false;
+
 
     recognition.lang =
         "en-SG";
@@ -591,6 +602,7 @@ function initialiseVoice() {
                 event.results[
                     event.results.length - 1
                 ];
+
 
             const transcript =
                 result[0].transcript.trim();
@@ -631,6 +643,7 @@ function initialiseVoice() {
 
                 voiceAvailable =
                     false;
+
 
                 updateVoiceStatus(
                     "MICROPHONE PERMISSION NEEDED"
@@ -681,6 +694,7 @@ function initialiseVoice() {
 
         recognition.start();
 
+
         updateVoiceStatus(
             "LISTENING FOR JARVIS"
         );
@@ -691,6 +705,7 @@ function initialiseVoice() {
             "Voice start:",
             error
         );
+
 
         updateVoiceStatus(
             "VOICE READY"
@@ -707,6 +722,7 @@ function updateVoiceStatus(status) {
         document.getElementById(
             "voiceStatus"
         );
+
 
     const panelElement =
         document.getElementById(
@@ -755,8 +771,10 @@ function speak(text) {
     speech.lang =
         "en-SG";
 
+
     speech.rate =
         1;
+
 
     speech.pitch =
         0.9;
@@ -849,6 +867,7 @@ function generateStudySession() {
 
     studyTotalSeconds =
         duration * 60;
+
 
     studySeconds =
         studyTotalSeconds;
@@ -966,6 +985,7 @@ function updateTimer() {
         Math.floor(
             studySeconds / 60
         );
+
 
     const seconds =
         studySeconds % 60;
@@ -1714,7 +1734,10 @@ function renderTests() {
                         </div>
 
                         <div class="item-meta">
-                            ${escapeHTML(item.topics || "No topics added")}
+                            ${escapeHTML(
+                                item.topics ||
+                                "No topics added"
+                            )}
                         </div>
 
                         <div class="item-meta">
@@ -1829,7 +1852,11 @@ function updateDashboardSummaries() {
         homeworkSummary.textContent =
             incomplete === 0
                 ? "No incomplete homework."
-                : `${incomplete} homework task${incomplete === 1 ? "" : "s"} remaining.`;
+                : `${incomplete} homework task${
+                    incomplete === 1
+                        ? ""
+                        : "s"
+                } remaining.`;
 
     }
 
@@ -1839,7 +1866,11 @@ function updateDashboardSummaries() {
         scheduleSummary.textContent =
             schedule.length === 0
                 ? "No events scheduled."
-                : `${schedule.length} event${schedule.length === 1 ? "" : "s"} scheduled.`;
+                : `${schedule.length} event${
+                    schedule.length === 1
+                        ? ""
+                        : "s"
+                } scheduled.`;
 
     }
 
@@ -1874,7 +1905,17 @@ function updateDashboardSummaries() {
             if (upcoming) {
 
                 testSummary.textContent =
-                    `${upcoming.subject}: ${daysUntil(upcoming.date)} day${daysUntil(upcoming.date) === 1 ? "" : "s"} remaining.`;
+                    `${upcoming.subject}: ${
+                        daysUntil(
+                            upcoming.date
+                        )
+                    } day${
+                        daysUntil(
+                            upcoming.date
+                        ) === 1
+                            ? ""
+                            : "s"
+                    } remaining.`;
 
             } else {
 
